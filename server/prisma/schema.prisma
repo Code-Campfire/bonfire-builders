@@ -9,9 +9,86 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
+  email      String @unique
+  password_hash String
+  role      String
+  first_name      String
+  last_name      String
+  phone String
+  apartment_number String
+  building_name String
+  address String
+  move_in_date DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  issues    Issue[]
+  messages  Message[]
+  @@map("users")
+}
+
+model Complex {
+  id        Int      @id @default(autoincrement())
   name      String
+  address   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("users")
+  issues    Issue[]
+
+  @@map("complexes")
+}
+
+model Issue {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  complex_id  Int
+  title       String
+  description String
+  category    String
+  priority    String
+  status      String
+  location    String
+  acknowledged_date DateTime
+  resolved_date DateTime
+  closed_date DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [user_id], references: [id])
+  complex     Complex  @relation(fields: [complex_id], references: [id])
+  photos      Photo[]
+
+  @@map("issues")
+}
+
+model Photo {
+  id        Int      @id @default(autoincrement())
+  issue_id  Int
+  file_path String
+  file_name String
+  file_size Int
+  mime_type String
+  caption String
+  uploaded_at DateTime @default(now())
+
+  issue     Issue    @relation(fields: [issue_id], references: [id])
+
+  @@map("photos")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  issue_id  Int
+  sender_id Int
+  sender_type String
+  message_text String
+  is_read Boolean
+  read_at DateTime
+  sent_at DateTime
+
+  issue     Issue    @relation(fields: [issue_id], references: [id])
+  sender    User     @relation(fields: [sender_id], references: [id])
+
+  @@map("messages")
 }
