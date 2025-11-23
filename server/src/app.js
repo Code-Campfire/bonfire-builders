@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const healthRouter = require('./routes/health');
+const userRouter = require('./routes/users');
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/health', healthRouter);
+app.use('/users', userRouter);
 
 // Basic route
 app.get('/', (req, res) => {
