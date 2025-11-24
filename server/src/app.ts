@@ -1,7 +1,8 @@
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
-const healthRouter = require('./routes/health');
+import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+import healthRouter from './routes/health';
+import usersRouter from './routes/users';
 
 const app = express();
 
@@ -16,16 +17,17 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/health', healthRouter);
+app.use('/api/users', usersRouter);
 
 // Basic route
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Apartment Maintenance Tracker API' });
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-module.exports = app;
+export default app;

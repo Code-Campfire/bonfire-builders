@@ -1,11 +1,11 @@
-const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+import express, { Request, Response } from 'express';
+import { PrismaClient } from '@prisma/client';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Health check endpoint that verifies database connection
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     // Try to query the database
     await prisma.$queryRaw`SELECT 1`;
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
       database: 'connected',
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Database connection error:', error);
     res.status(503).json({
       status: 'error',
@@ -27,4 +27,4 @@ router.get('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
