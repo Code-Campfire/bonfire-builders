@@ -3,7 +3,10 @@ import cors from 'cors';
 import morgan from 'morgan';
 import healthRouter from './routes/health';
 import usersRouter from './routes/users';
-
+import issuesRouter from './routes/issues';
+import photosRouter from './routes/photos';
+import messagesRouter from './routes/messages';
+import complexesRouter from './routes/complexes';
 const app = express();
 
 // Middleware
@@ -18,6 +21,10 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/health', healthRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/issues', issuesRouter);
+app.use('/api/photos', photosRouter);
+app.use('/api/messages', messagesRouter);
+app.use('/api/complexes', complexesRouter);
 
 // Basic route
 app.get('/', (req: Request, res: Response) => {
