@@ -22,6 +22,25 @@ router.get('/', async (req: Request, res: Response) => {
 // GET a specific user
 // GET all users for a specific complex
 // POST a new user
+router.post('/', async (req: Request, res: Response) => {
+  try {
+    const result = await prisma.user.create({
+      data: req.body
+    })
+    res.json({
+      status: "Ok",
+      message: "User successfully created in database.",
+      result: "Result of request: " + " " + result
+    })
+  }
+  catch(error){
+    res.json({
+      status: "Bad Request",
+      message: "There was an error creating the user in the database",
+      error: error,
+    })
+  }
+})
 // PUT a user
 // DELETE a user
 
