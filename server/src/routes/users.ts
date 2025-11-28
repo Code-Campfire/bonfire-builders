@@ -144,6 +144,90 @@ router.get('/in-apartment/:apartmentId', async (req: Request, res: Response) => 
 })
 
 // PUT a user
+router.put('/:id', async (req: Request, res: Response) => {
+  try {
+    // Verifies that user first exists before update
+    const uniqueUser = await prisma.user.findUnique({
+      where: {
+        id: Number(req.params.id)
+      }
+    })
+
+    // User does not exist, quits query and responds
+    if (uniqueUser === null) {
+      res.status(404).json({
+        message: "There was an error updating the user",
+        error: "ERROR: No user found with ID: " + req.params.id
+      })
+    }
+
+    // User exists, performs update and responds
+    const result = await prisma.user.update({
+      data: req.body,
+      where: {
+        id: Number(req.params.id)
+      },
+      // Excludes password and metadata from response
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        first_name: true,
+        last_name: true,
+        phone: true,
+        apartment_number: true,
+        building_name: true,
+        complex_id: true,
+        move_in_date: true,
+      }
+    })
+        
+    res.status(200).json({
+      message: "User successfully updated",
+      user: result
+    })
+  }
+  catch(error: any) {
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: "ERROR: " + error.message
+    })
+  }
+})
+
 // DELETE a user
+router.delete("/:id", async (req: Request, res: Response) => {
+  try {
+     // Verifies that user first exists before update
+    const uniqueUser = await prisma.user.findUnique({
+      where: {
+        id: Number(req.params.id)
+      }
+    })
+
+    // User does not exist, quits query and responds
+    if (uniqueUser === null) {
+      res.status(404).json({
+        message: "There was an error deleting the user",
+        error: "ERROR: No user found with ID: " + req.params.id
+      })
+    }
+
+    // Users exists in the database, deletes and responds
+    const userToDelete = await prisma.user.delete({
+      where: {
+        id: Number(req.params.id)
+      }
+    })
+
+    res.status(204).json({})
+  }
+  catch(error: any) {
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: "ERROR: " + error.message
+    })
+  }
+})
 
 export default router;
