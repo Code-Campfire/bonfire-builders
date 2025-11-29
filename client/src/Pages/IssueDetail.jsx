@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader } from '../Components/ui/card';
-import { StatusBadge } from '../Components/StatusBadge';
-import { PriorityBadge } from '../Components/PriorityBadge';
+import { Card, CardContent, CardHeader } from '../components/ui/card';
+import { StatusBadge } from '../components/StatusBadge';
+import { PriorityBadge } from '../components/PriorityBadge';
 import { formatCategory } from '@/utils/categoryUtils';
 import { getDaysAgo } from '@/utils/dateUtils';
 import { issueAPI } from '../services/api';
