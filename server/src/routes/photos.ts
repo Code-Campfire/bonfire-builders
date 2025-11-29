@@ -1,10 +1,11 @@
 import express, { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { AuthRequest, authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     // Fetch all photos from the database
     const photos = await prisma.photo.findMany();

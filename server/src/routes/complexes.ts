@@ -1,11 +1,12 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { AuthRequest, authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET all complexes
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const complexes = await prisma.complex.findMany({
       include: {
@@ -24,7 +25,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // GET a specific complex
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const complex = await prisma.complex.findUnique({
       where: {
@@ -41,7 +42,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 // POST a new complex
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const complex = await prisma.complex.create({
       data: req.body
@@ -56,7 +57,7 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 // PUT a complex
-router.put('/:id', async (req: Request, res: Response) => {
+router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const complex = await prisma.complex.update({
       where: {
@@ -74,7 +75,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 });
 
 // DELETE a complex
-router.delete('/:id', async (req: Request, res: Response) => {
+router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     await prisma.complex.delete({
       where: {
