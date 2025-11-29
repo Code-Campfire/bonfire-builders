@@ -5,6 +5,10 @@
  */
 export const formatCategory = (category) => {
   if (!category) return '';
+  const categoryObj = getCategories().find(c => c.value === category);
+  return categoryObj ? categoryObj.label : category;
+};
+  if (!category) return '';
   
   // Convert underscores to spaces and title case each word
   return category
