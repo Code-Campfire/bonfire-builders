@@ -19,26 +19,84 @@ CREATE TYPE "Priority" AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'URGENT');
 -- CreateEnum
 CREATE TYPE "Status" AS ENUM ('OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED');
 
--- AlterTable
-ALTER TABLE "issues" DROP COLUMN "category",
-ADD COLUMN     "category" "Category" NOT NULL,
-DROP COLUMN "priority",
-ADD COLUMN     "priority" "Priority" NOT NULL,
-DROP COLUMN "status",
-ADD COLUMN     "status" "Status" NOT NULL DEFAULT 'OPEN',
-ALTER COLUMN "acknowledged_date" DROP NOT NULL,
-ALTER COLUMN "resolved_date" DROP NOT NULL,
-ALTER COLUMN "closed_date" DROP NOT NULL;
+-- AlterTable (Safe migration for issues table)
+-- Step 1: Add new columns (nullable for now)
+ALTER TABLE "issues"
+  ADD COLUMN "category_new" "Category",
+  ADD COLUMN "priority_new" "Priority",
+  ADD COLUMN "status_new" "Status" DEFAULT 'OPEN';
+
+-- Step 2: Copy and transform data
+UPDATE "issues" SET
+  category_new = 
+    CASE
+      WHEN category IS NULL THEN NULL
+      ELSE UPPER(category)::"Category"
+    END,
+  priority_new = 
+    CASE
+      WHEN priority IS NULL THEN NULL
+      ELSE UPPER(priority)::"Priority"
+    END,
+  status_new = 
+    CASE
+      WHEN status IS NULL THEN NULL
+      ELSE UPPER(status)::"Status"
+    END;
+
+-- Step 3: Set new columns to NOT NULL (if required)
+ALTER TABLE "issues"
+  ALTER COLUMN "category_new" SET NOT NULL,
+  ALTER COLUMN "priority_new" SET NOT NULL,
+  ALTER COLUMN "status_new" SET NOT NULL;
+
+-- Step 4: Drop old columns
+ALTER TABLE "issues"
+  DROP COLUMN "category",
+  DROP COLUMN "priority",
+  DROP COLUMN "status";
+
+-- Step 5: Rename new columns to original names
+ALTER TABLE "issues"
+  RENAME COLUMN "category_new" TO "category",
+  RENAME COLUMN "priority_new" TO "priority",
+  RENAME COLUMN "status_new" TO "status";
+
+-- Retain other column changes
+ALTER TABLE "issues"
+  ALTER COLUMN "acknowledged_date" DROP NOT NULL,
+  ALTER COLUMN "resolved_date" DROP NOT NULL,
+  ALTER COLUMN "closed_date" DROP NOT NULL;
 
 -- AlterTable
 ALTER TABLE "messages" ALTER COLUMN "is_read" SET DEFAULT false,
 ALTER COLUMN "read_at" DROP NOT NULL,
 ALTER COLUMN "sent_at" SET DEFAULT CURRENT_TIMESTAMP;
 
--- AlterTable
-ALTER TABLE "users" DROP COLUMN "role",
-ADD COLUMN     "role" "Role" NOT NULL DEFAULT 'TENANT';
+-- AlterTable (Safe migration for users.role)
+-- Step 1: Add new column (nullable for now)
+ALTER TABLE "users"
+  ADD COLUMN "role_new" "Role";
 
+-- Step 2: Copy and transform data
+UPDATE "users" SET
+  role_new = 
+    CASE
+      WHEN role IS NULL THEN NULL
+      ELSE UPPER(role)::"Role"
+    END;
+
+-- Step 3: Set new column to NOT NULL (if required)
+ALTER TABLE "users"
+  ALTER COLUMN "role_new" SET NOT NULL;
+
+-- Step 4: Drop old column
+ALTER TABLE "users"
+  DROP COLUMN "role";
+
+-- Step 5: Rename new column to original name
+ALTER TABLE "users"
+  RENAME COLUMN "role_new" TO "role";
 -- CreateIndex
 CREATE INDEX "issues_user_id_idx" ON "issues"("user_id");
 
