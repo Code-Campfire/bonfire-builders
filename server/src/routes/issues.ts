@@ -102,13 +102,9 @@ router.post('/', async (req: Request, res: Response) => {
         description: description.trim(),
         category,
         priority,
-        status: 'open',
         location: location.trim(),
         user_id: userId,
-        complex_id: complexId,
-        acknowledged_date: new Date(), // Temporary - should be null initially
-        resolved_date: new Date(), // Temporary - should be null initially
-        closed_date: new Date() // Temporary - should be null initially
+        complex_id: complexId
       },
       include: {
         user: {

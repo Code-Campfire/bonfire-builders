@@ -131,13 +131,19 @@ const IssueForm = ({ onSubmit, onCancel }) => {
             }`}
           >
             <option value="">Select a category</option>
-            <option value="Plumbing">Plumbing</option>
+            <option value="PLUMBING">Plumbing</option>
+            <option value="ELECTRICAL">Electrical</option>
             <option value="HVAC">HVAC</option>
-            <option value="Electrical">Electrical</option>
-            <option value="Appliance">Appliance</option>
-            <option value="Structural">Structural</option>
-            <option value="Pest Control">Pest Control</option>
-            <option value="Other">Other</option>
+            <option value="STRUCTURAL">Structural</option>
+            <option value="APPLIANCE">Appliance</option>
+            <option value="PEST_CONTROL">Pest Control</option>
+            <option value="LOCKS_KEYS">Locks & Keys</option>
+            <option value="FLOORING">Flooring</option>
+            <option value="WALLS_CEILING">Walls & Ceiling</option>
+            <option value="WINDOWS_DOORS">Windows & Doors</option>
+            <option value="LANDSCAPING">Landscaping</option>
+            <option value="PARKING">Parking</option>
+            <option value="OTHER">Other</option>
           </select>
           {errors.category && (
             <p className="text-red-500 text-sm mt-1">{errors.category}</p>
@@ -159,10 +165,10 @@ const IssueForm = ({ onSubmit, onCancel }) => {
             }`}
           >
             <option value="">Select priority level</option>
-            <option value="low">Low - Can wait</option>
-            <option value="medium">Medium - Should be addressed soon</option>
-            <option value="high">High - Needs attention</option>
-            <option value="urgent">Urgent - Immediate action required</option>
+            <option value="LOW">Low - Can wait</option>
+            <option value="MEDIUM">Medium - Should be addressed soon</option>
+            <option value="HIGH">High - Needs attention</option>
+            <option value="URGENT">Urgent - Immediate action required</option>
           </select>
           {errors.priority && (
             <p className="text-red-500 text-sm mt-1">{errors.priority}</p>
