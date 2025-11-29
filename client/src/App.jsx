@@ -1,61 +1,29 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { Routes, Route, Link } from 'react-router-dom';
+import Issues from './pages/Issues';
 
-function App() {
-  const [connectionStatus, setConnectionStatus] = useState({
-    loading: true,
-    connected: false,
-    message: 'Checking connection...'
-  });
-
-  useEffect(() => {
-    const checkConnection = async () => {
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-        const response = await axios.get(`${apiUrl}/health`);
-
-        if (response.data.status === 'ok' && response.data.database === 'connected') {
-          setConnectionStatus({
-            loading: false,
-            connected: true,
-            message: 'Connected'
-          });
-        } else {
-          setConnectionStatus({
-            loading: false,
-            connected: false,
-            message: 'Backend connected but database disconnected'
-          });
-        }
-      } catch (error) {
-        setConnectionStatus({
-          loading: false,
-          connected: false,
-          message: 'Not connected'
-        });
-      }
-    };
-
-    checkConnection();
-  }, []);
-
+function Home() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-md text-center">
         <h1 className="text-4xl font-bold text-gray-800 mb-4">
-          Hello World
+          Apartment Tracker
         </h1>
-        <div className="mt-6">
-          {connectionStatus.loading ? (
-            <p className="text-gray-600">Checking connection...</p>
-          ) : (
-            <p className={`text-lg font-semibold ${connectionStatus.connected ? 'text-green-600' : 'text-red-600'}`}>
-              {connectionStatus.message}
-            </p>
-          )}
-        </div>
+        <nav className="mt-6 space-x-4">
+          <Link to="/issues" className="text-blue-600 hover:underline">
+            View Issues
+          </Link>
+        </nav>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/issues" element={<Issues />} />
+    </Routes>
   );
 }
 
