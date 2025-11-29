@@ -1,10 +1,11 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import prisma from '../lib/prisma';
+import { AuthRequest, authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 
 // GET all issues
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const issues = await prisma.issue.findMany();
     res.json(issues);
@@ -17,7 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // GET all messages for a specific issue
-router.get('/:id/messages', async (req: Request, res: Response) => {
+router.get('/:id/messages', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const messages = await prisma.message.findMany({
       where: {
