@@ -7,6 +7,7 @@ import issuesRouter from './routes/issues';
 import photosRouter from './routes/photos';
 import messagesRouter from './routes/messages';
 import complexesRouter from './routes/complexes';
+import authRouter from './routes/auth'
 const app = express();
 
 // Middleware
@@ -25,6 +26,7 @@ app.use('/api/issues', issuesRouter);
 app.use('/api/photos', photosRouter);
 app.use('/api/messages', messagesRouter);
 app.use('/api/complexes', complexesRouter);
+app.use('/api/auth', authRouter)
 
 // Basic route
 app.get('/', (req: Request, res: Response) => {
