@@ -71,7 +71,7 @@ enum Status {
 
 ### 3. Frontend Components
 
-#### IssueForm (`client/src/Components/IssueForm.jsx`)
+#### IssueForm (`client/src/Components/issueForm.jsx`)
 Updated dropdown options to use enum values:
 - **Categories**: PLUMBING, ELECTRICAL, HVAC, STRUCTURAL, APPLIANCE, PEST_CONTROL, LOCKS_KEYS, FLOORING, WALLS_CEILING, WINDOWS_DOORS, LANDSCAPING, PARKING, OTHER
 - **Priorities**: LOW, MEDIUM, HIGH, URGENT
