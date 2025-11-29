@@ -1,11 +1,13 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
+import { PrismaClient } from '@prisma/client';
+import { AuthRequest, authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 const prisma = require("../../prisma/client.js");
 
 
 // Health check endpoint that verifies database connection
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     // Try to query the database
     await prisma.$queryRaw`SELECT 1`;
