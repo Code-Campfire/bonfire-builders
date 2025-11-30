@@ -28,6 +28,8 @@ function Home() {
 function App() {
   const { token } = useAuth()
 
+  const { token } = useAuth()
+
   return (
     <Routes>
       <Route path="/login" element={<LoginForm />} />
@@ -42,7 +44,6 @@ function App() {
           <Issues />
         </ProtectedRoute>
       } />
-      <Route path="/issues/:id" element={<IssueDetail />} />
     </Routes>
   );
 }
