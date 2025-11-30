@@ -38,8 +38,16 @@ function App() {
           <Layout />
         </ProtectedRoute>
       }>
-        <Route path="/" element={<Home />} />
-        <Route path="/issues" element={<Issues />} />
+      <Route path="/" element={
+        <ProtectedRoute>
+          <Home />
+        </ProtectedRoute>
+      } />
+        <Route path="/issues" element={
+        <ProtectedRoute>
+          <Issues />
+        </ProtectedRoute>
+      } />
       </Route>
       <Route path="/issues/:id" element={
         <ProtectedRoute>
