@@ -15,13 +15,14 @@ model User {
   first_name      String
   last_name      String
   phone String
-  apartment_number String
-  building_name String
-  address String
+  complex_id Int // Reference includes address. User does not need it
+  apartment_number String // More specific information per user
+  building_name String // More specific information per user
   move_in_date DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
+  complex   Complex  @relation(fields: [complex_id], references: [id])
   issues    Issue[]
   messages  Message[]
   @@map("users")
@@ -34,6 +35,7 @@ model Complex {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  users     User[]
   issues    Issue[]
 
   @@map("complexes")
