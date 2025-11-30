@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import IssueCard from '../Components/IssueCard';
-import IssueForm from '../Components/IssueForm';
+import IssueCard from '../components/IssueCard';
+import IssueForm from '../Components/issueForm';
 import { issueAPI } from '../services/api';
 
 const Issues = () => {
