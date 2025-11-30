@@ -17,7 +17,6 @@ export const LoginForm = () => {
             ...prev,
             [name]: value
         }))
-
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
@@ -111,4 +110,3 @@ export const LoginForm = () => {
         </div>
     )
 }
-
