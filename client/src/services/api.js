@@ -83,14 +83,22 @@ export const issueAPI = {
 
 // User API calls
 export const userAPI = {
+<<<<<<< HEAD
   loginUser: async (userCredentials) => {
     try {
       const response = await api.post(`/auth/login`, userCredentials);
+=======
+  // Login User
+  loginUser: async (userCredentials) => {
+    try {
+      const response = await api.post(`/auth/login`);
+>>>>>>> 6154279 (feat: Add authentication system to client)
       return response.data;
     } catch (error) {
       console.error('Error authenticating user: ', error);
       throw error;
     }
+<<<<<<< HEAD
   },
   registerUser: async (userCredentials) => {
     try {
@@ -121,9 +129,16 @@ export const complexAPI = {
       console.error("Error creating complex in database", error)
       throw error;
     }
+=======
+>>>>>>> 6154279 (feat: Add authentication system to client)
   }
 }
 
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 6154279 (feat: Add authentication system to client)
 export default api;
