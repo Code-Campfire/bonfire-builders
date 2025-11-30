@@ -78,4 +78,22 @@ export const issueAPI = {
   },
 };
 
+// User API calls
+export const userAPI = {
+  // Login User
+  loginUser: async (userCredentials) => {
+    try {
+      const response = await api.post(`/auth/login`);
+      return response.data;
+    } catch (error) {
+      console.error('Error authenticating user: ', error);
+      throw error;
+    }
+  }
+}
+
+
+
+
+
 export default api;
