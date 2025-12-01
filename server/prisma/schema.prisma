@@ -11,7 +11,7 @@ model User {
   id        Int      @id @default(autoincrement())
   email      String @unique
   password_hash String
-  role      String
+  role      Role     @default(TENANT)
   first_name      String
   last_name      String
   phone String
@@ -45,13 +45,13 @@ model Issue {
   complex_id  Int
   title       String
   description String
-  category    String
-  priority    String
-  status      String
+  category    Category
+  priority    Priority
+  status      Status   @default(OPEN)
   location    String
-  acknowledged_date DateTime
-  resolved_date DateTime
-  closed_date DateTime
+  acknowledged_date DateTime?
+  resolved_date DateTime?
+  closed_date DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
@@ -61,6 +61,11 @@ model Issue {
   messages    Message[]
 
   @@map("issues")
+  @@index([user_id])
+  @@index([complex_id])
+  @@index([status])
+  @@index([category])
+  @@index([priority])
 }
 
 model Photo {
@@ -84,12 +89,49 @@ model Message {
   sender_id Int
   sender_type String
   message_text String
-  is_read Boolean
-  read_at DateTime
-  sent_at DateTime
+  is_read Boolean @default(false)
+  read_at DateTime?
+  sent_at DateTime @default(now())
 
   issue     Issue    @relation(fields: [issue_id], references: [id])
   sender    User     @relation(fields: [sender_id], references: [id])
 
   @@map("messages")
+}
+
+// Enums
+enum Role {
+  TENANT
+  LANDLORD
+  ADMIN
+}
+
+enum Category {
+  PLUMBING
+  ELECTRICAL
+  HVAC
+  STRUCTURAL
+  APPLIANCE
+  PEST_CONTROL
+  LOCKS_KEYS
+  FLOORING
+  WALLS_CEILING
+  WINDOWS_DOORS
+  LANDSCAPING
+  PARKING
+  OTHER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
 }

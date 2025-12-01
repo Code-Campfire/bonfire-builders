@@ -6,6 +6,7 @@ import { StatusBadge } from './StatusBadge';
 import { PriorityBadge } from './PriorityBadge';
 import { mockIssue } from '../data/mockIssues';
 import { getDaysAgo } from '@/utils/dateUtils';
+import { formatCategory } from '@/utils/categoryUtils';
 import {
   Tooltip,
   TooltipContent,
@@ -16,7 +17,7 @@ import {
 const IssueCard = ({ issue = mockIssue }) => {
   return (
     <Link to={`/issues/${issue.id}`}>
-      <Card className={`hover:border-primary/50 transition-all hover:shadow-md cursor-pointer ${issue.status === 'closed' ? 'opacity-70' : ''}`}>
+      <Card className={`hover:border-primary/50 transition-all hover:shadow-md cursor-pointer ${issue.status === 'CLOSED' ? 'opacity-70' : ''}`}>
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
@@ -67,7 +68,7 @@ const IssueCard = ({ issue = mockIssue }) => {
 
           <div className="flex items-center justify-between text-sm">
             <span className="px-2 py-1 bg-secondary rounded-md text-secondary-foreground">
-              {issue.category}
+              {formatCategory(issue.category)}
             </span>
             <div className="flex items-center gap-3 text-xs">
               <span className="text-muted-foreground">

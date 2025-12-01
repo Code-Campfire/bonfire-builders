@@ -25,7 +25,7 @@ async function main() {
       id: 1,
       email: 'test.user@example.com',
       password_hash: 'hashed_password_here', // In real app, this would be bcrypt hashed
-      role: 'tenant',
+      role: 'TENANT',
       first_name: 'John',
       last_name: 'Doe',
       phone: '555-0123',
