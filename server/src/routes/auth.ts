@@ -19,7 +19,7 @@ router.post('/login', async (req: Request, res: Response) => {
         phone: true,
         apartment_number: true,
         building_name: true,
-        address: true,
+        complex_id: true,
         move_in_date: true,
       }
     })
@@ -43,7 +43,7 @@ router.post('/login', async (req: Request, res: Response) => {
         phone: result?.phone,
         apartment_number: result?.apartment_number,
         building_name: result?.building_name,
-        address: result?.address,
+        complex_id: result?.complex_id,
         move_in_date: result?.move_in_date
       },
       secret,
@@ -81,7 +81,7 @@ router.post('/register', async (req: Request, res: Response) => {
         phone: true,
         apartment_number: true,
         building_name: true,
-        address: true,
+        complex_id: true,
         move_in_date: true,
       }
     })
@@ -103,7 +103,7 @@ router.post('/register', async (req: Request, res: Response) => {
         phone: result?.phone,
         apartment_number: result?.apartment_number,
         building_name: result?.building_name,
-        address: result?.address,
+        complex_id: result?.complex_id,
         move_in_date: result?.move_in_date
       },
       secret,
