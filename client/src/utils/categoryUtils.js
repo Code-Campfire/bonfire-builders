@@ -8,16 +8,6 @@ export const formatCategory = (category) => {
   const categoryObj = getCategories().find(c => c.value === category);
   return categoryObj ? categoryObj.label : category;
 };
-  if (!category) return '';
-  
-  // List of acronyms to preserve casing
-  const acronyms = ['HVAC'];
-  // Convert underscores to spaces and title case each word, preserving acronyms
-  return category
-    .split('_')
-    .map(word => acronyms.includes(word) ? word : word.charAt(0) + word.slice(1).toLowerCase())
-    .join(' ');
-};
 
 /**
  * Get all available categories
