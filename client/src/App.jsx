@@ -44,6 +44,7 @@ function App() {
           <Issues />
         </ProtectedRoute>
       } />
+      <Route path="/issues/:id" element={<IssueDetail />} />
     </Routes>
   );
 }
