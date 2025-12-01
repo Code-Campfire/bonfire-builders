@@ -1,15 +1,29 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useDeferredValue, useState } from "react";
 import { userAPI } from "../services/api";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null)
+    const [user, setUser] = useState(null)
 
     async function login(userCredentials) {
-        const user = await userAPI.loginUser(userCredentials)
-        setToken(user.token)
+        try {
 
-        localStorage.setItem("token", user.token)
+            const response = await userAPI.loginUser(userCredentials)
+            
+            setToken(response.token)
+            setUser(response.user)
+            localStorage.setItem("token", response.token)
+
+            console.log("User successfully retrieved")
+
+            return response
+        } catch (error) {
+            console.error("Error retrieving user: ", error)
+            throw error
+        }
+
+        
     }
 
     function logout() {

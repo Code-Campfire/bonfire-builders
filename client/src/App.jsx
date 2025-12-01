@@ -1,5 +1,5 @@
 import { Routes, Route, Link } from 'react-router-dom';
-import Issues from './pages/Issues';
+import Issues from './Pages/Issues';
 import IssueDetail from './Pages/IssueDetail';
 import { useState } from 'react';
 import { useAuth } from './context/context';
@@ -42,7 +42,11 @@ function App() {
           <Issues />
         </ProtectedRoute>
       } />
-      <Route path="/issues/:id" element={<IssueDetail />} />
+      <Route path="/issues/:id" element={
+        <ProtectedRoute>
+          <IssueDetail />
+        </ProtectedRoute>
+        } />
     </Routes>
   );
 }

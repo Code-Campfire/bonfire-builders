@@ -83,7 +83,7 @@ export const userAPI = {
   // Login User
   loginUser: async (userCredentials) => {
     try {
-      const response = await api.post(`/auth/login`);
+      const response = await api.post(`/auth/login`, userCredentials);
       return response.data;
     } catch (error) {
       console.error('Error authenticating user: ', error);
