@@ -9,7 +9,7 @@ CREATE TABLE "users" (
     "phone" TEXT NOT NULL,
     "apartment_number" TEXT NOT NULL,
     "building_name" TEXT NOT NULL,
-    "address" TEXT NOT NULL,
+    "complex_id" INTEGER NOT NULL,
     "move_in_date" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -93,3 +93,5 @@ ALTER TABLE "messages" ADD CONSTRAINT "messages_issue_id_fkey" FOREIGN KEY ("iss
 
 -- AddForeignKey
 ALTER TABLE "messages" ADD CONSTRAINT "messages_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "users" ADD CONSTRAINT "users_complex_id_fkey" FOREIGN KEY ("complex_id") REFERENCES "complexes"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
