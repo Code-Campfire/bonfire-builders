@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { useAuth } from "../../context/context"
 import { useNavigate } from "react-router-dom";
-import { userAPI } from "../../services/api";
+import { complexAPI, userAPI } from "../../services/api";
 
 export const RegistrationForm = () => {
     const navigate = useNavigate()
-    const { register } = useAuth();
+    const { register, user, updateUser } = useAuth();
     const [userFormData, setUserFormData] = useState({
-        email: '',
-        password_hash: '',
-        role: 'TENANT',
-        first_name: '',
-        last_name: '',
-        phone: '',  
+        email: 'eb934053@gmail.com',
+        password_hash: 'password',
+        role: 'LANDLORD',
+        first_name: 'Ethan',
+        last_name: 'Brown',
+        phone: '6156182727',  
         complex_id: 1,
         apartment_number: '',
         building_name: '',
@@ -22,8 +22,8 @@ export const RegistrationForm = () => {
 
     });
     const [landlordComplexFormData, setLandLordComplexFormData] = useState({
-        name: '',
-        address: '',
+        name: 'Shady Oaks',
+        address: '123 Main St',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
 
@@ -81,10 +81,10 @@ export const RegistrationForm = () => {
         if (!userFormData.phone.trim()) {
             newErrors.phone = 'Phone is required';
         }
-        if (!userFormData.apartment_number.trim()) {
+        if (!userFormData.apartment_number.trim() && userFormData.role !== "LANDLORD") {
             newErrors.apartment_number = 'Apartment number is required';
         }
-        if (!userFormData.building_name.trim()) {
+        if (!userFormData.building_name.trim() && userFormData.role !== "LANDLORD") {
             newErrors.building_name = 'Building name is required';
         }
         if (!landlordComplexFormData.name.trim() && userFormData.role !== "TENANT") {
@@ -99,7 +99,6 @@ export const RegistrationForm = () => {
     async function handleSubmit(e) {
         e.preventDefault();
 
-        console.log("Button clicked")
         const validationErrors = validate()
 
         if (Object.keys(validationErrors).length > 0) {
@@ -107,14 +106,37 @@ export const RegistrationForm = () => {
             return;
         }
 
-        await register(userFormData)
+        // Sends userFormData to context file before API call
+        // Returns registered user information
+        const registeredUser = await register(userFormData)
+
+        // Only in the case of registering a landlord
+        if(userFormData.role === "LANDLORD") {
+
+            // Creates complex associated with registering landlord
+            const createdComplex = await complexAPI.createComplex(landlordComplexFormData)
+
+            // Updates default complex_id value on registered landlord
+            registeredUser.complex_id = createdComplex.id
+
+            // Sends apartment complex form data to API for creation
+            const response = await userAPI.updateUser(registeredUser)
+            
+            // Updates landlord user -> apartment complex reference
+            updateUser(response.user)
+
+            // Console out process step
+            console.log("User successfully updated!")
+        }
 
         const locallyStoredToken = localStorage.getItem("token")
-
+        
+        // Error handling, that API generated token was stored locally
         if (!locallyStoredToken) {
             throw new Error("Token was not saved locally")
         }
 
+        // Navigate authenticated user to home route
         navigate("/")
     }
 
@@ -256,7 +278,7 @@ export const RegistrationForm = () => {
                         <label htmlFor="complex_name" className="block text-sm font-medium text-gray-700 mb-1">Complex name: </label>
                         <input
                             type="text"
-                            value={landlordComplexFormData.complex_name}
+                            value={landlordComplexFormData.name}
                             id="name"
                             name="name"
                             onChange={handleComplexChange}
