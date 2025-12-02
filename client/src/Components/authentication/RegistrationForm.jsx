@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { useAuth } from "../../context/context"
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { userAPI } from "../../services/api";
 
 export const RegistrationForm = () => {
     const navigate = useNavigate()
+    const { register } = useAuth();
     const [userFormData, setUserFormData] = useState({
         email: '',
-        password: '',
+        password_hash: '',
         role: 'TENANT',
         first_name: '',
         last_name: '',
-        phone: '',
-        complex_id: 0,
+        phone: '',  
+        complex_id: 1,
         apartment_number: '',
         building_name: '',
         move_in_date: new Date().toISOString(),
@@ -29,9 +31,23 @@ export const RegistrationForm = () => {
     const [errors, setErrors] = useState({});
     const { login } = useAuth()
 
-    function handleChange(e) {
+    function handleUserChange(e) {
         const { name, value } = e.target
         setUserFormData(prev => ({
+            ...prev,
+            [name]: value
+        }))
+
+        if (errors[name]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: ''
+            }));
+        }
+    }
+    function handleComplexChange(e) {
+        const { name, value } = e.target
+        setLandLordComplexFormData(prev => ({
             ...prev,
             [name]: value
         }))
@@ -50,8 +66,8 @@ export const RegistrationForm = () => {
         if (!userFormData.email.trim()) {
             newErrors.email = 'Email is required';
         }
-        if (!userFormData.password.trim()) {
-            newErrors.password = 'Password is required';
+        if (!userFormData.password_hash.trim()) {
+            newErrors.password_hash = 'Password is required';
         }
         if (!userFormData.role.trim()) {
             newErrors.role = 'Role is required';
@@ -71,18 +87,19 @@ export const RegistrationForm = () => {
         if (!userFormData.building_name.trim()) {
             newErrors.building_name = 'Building name is required';
         }
-        if (!landlordComplexFormData.name.trim()) {
+        if (!landlordComplexFormData.name.trim() && userFormData.role !== "TENANT") {
             newErrors.name = 'Complex name is required';
         }
-        if (!landlordComplexFormData.address.trim()) {
+        if (!landlordComplexFormData.address.trim() && userFormData.role !== "TENANT") {
             newErrors.address = 'Complex address is required';
         }
 
         return newErrors;
     };
-    async function handleTenantSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault();
 
+        console.log("Button clicked")
         const validationErrors = validate()
 
         if (Object.keys(validationErrors).length > 0) {
@@ -90,7 +107,7 @@ export const RegistrationForm = () => {
             return;
         }
 
-        await login(userFormData)
+        await register(userFormData)
 
         const locallyStoredToken = localStorage.getItem("token")
 
@@ -103,13 +120,13 @@ export const RegistrationForm = () => {
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold mb-6 text-gray-800"> Please, Log In</h3>
+            <h3 className="text-2xl font-bold mb-6 text-gray-800"> Please, Register</h3>
             <form className="space-y-4">
                 <select
                     id="role"
                     name="role"
                     value={userFormData.role}
-                    onChange={handleChange}
+                    onChange={handleUserChange}
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.role ? 'border-red-500' : 'border-gray-300'
                         }`}
                 >
@@ -122,7 +139,7 @@ export const RegistrationForm = () => {
                     value={userFormData.email}
                     id="email"
                     name="email"
-                    onChange={handleChange}
+                    onChange={handleUserChange}
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? 'border-red-500' : 'border-gray-300'
                         }`}
                 />
@@ -133,10 +150,10 @@ export const RegistrationForm = () => {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password: </label>
                 <input
                     type="text"
-                    value={userFormData.password}
-                    id="password"
-                    name="password"
-                    onChange={handleChange}
+                    value={userFormData.password_hash}
+                    id="password_hash"
+                    name="password_hash"
+                    onChange={handleUserChange}
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password ? 'border-red-500' : 'border-gray-300'
                         }`}
                 />
@@ -149,7 +166,7 @@ export const RegistrationForm = () => {
                     value={userFormData.first_name}
                     id="first_name"
                     name="first_name"
-                    onChange={handleChange}
+                    onChange={handleUserChange}
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.first_name ? 'border-red-500' : 'border-gray-300'
                         }`}
                 />
@@ -163,7 +180,7 @@ export const RegistrationForm = () => {
                     value={userFormData.last_name}
                     id="last_name"
                     name="last_name"
-                    onChange={handleChange}
+                    onChange={handleUserChange}
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.last_name ? 'border-red-500' : 'border-gray-300'
                         }`}
                 />
@@ -176,7 +193,7 @@ export const RegistrationForm = () => {
                     value={userFormData.phone}
                     id="phone"
                     name="phone"
-                    onChange={handleChange}
+                    onChange={handleUserChange}
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'
                         }`}
                 />
@@ -193,7 +210,7 @@ export const RegistrationForm = () => {
                             value={userFormData.building_name}
                             id="building_name"
                             name="building_name"
-                            onChange={handleChange}
+                            onChange={handleUserChange}
                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.building_name ? 'border-red-500' : 'border-gray-300'
                                 }`}
                         />
@@ -206,7 +223,7 @@ export const RegistrationForm = () => {
                             value={userFormData.apartment_number}
                             id="apartment_number"
                             name="apartment_number"
-                            onChange={handleChange}
+                            onChange={handleUserChange}
                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.apartment_number ? 'border-red-500' : 'border-gray-300'
                                 }`}
                         />
@@ -216,6 +233,25 @@ export const RegistrationForm = () => {
                     </>
                     :
                     <>
+                    <h3 className="text-1x1 font-bold mb-8 text-gray-800">Optional fields</h3>
+                    <label htmlFor="landlord_building_name" className="block text-sm font-medium text-gray-700 mb-1">Building name: </label>
+                        <input
+                            type="text"
+                            value={userFormData.building_name}
+                            id="landlord_building_name"
+                            name="landlord_building_name"
+                            onChange={handleUserChange}
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        />
+                        <label htmlFor="landlord_apartment_number" className="block text-sm font-medium text-gray-700 mb-1">Apartment number: </label>
+                        <input
+                            type="text"
+                            value={userFormData.apartment_number}
+                            id="landlord_apartment_number"
+                            name="landlord_apartment_number"
+                            onChange={handleComplexChange}
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        />
                         <h3 className="text-1x1 font-bold mb-8 text-gray-800">Please, enter information about your apartment complex</h3>
                         <label htmlFor="complex_name" className="block text-sm font-medium text-gray-700 mb-1">Complex name: </label>
                         <input
@@ -223,7 +259,7 @@ export const RegistrationForm = () => {
                             value={landlordComplexFormData.complex_name}
                             id="name"
                             name="name"
-                            onChange={handleChange}
+                            onChange={handleComplexChange}
                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-500' : 'border-gray-300'
                                 }`}
                         />
@@ -236,7 +272,7 @@ export const RegistrationForm = () => {
                             value={landlordComplexFormData.address}
                             id="address"
                             name="address"
-                            onChange={handleChange}
+                            onChange={handleComplexChange}
                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.address ? 'border-red-500' : 'border-gray-300'
                                 }`}
                         />

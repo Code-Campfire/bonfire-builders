@@ -41,7 +41,25 @@ export const AuthProvider = ({ children }) => {
             console.error("Error retrieving user: ", error)
             throw error
         }
+        
+    }
 
+    async function register(userCredentials) {
+        try {
+
+            const response = await userAPI.registerUser(userCredentials)
+            
+            setToken(response.token)
+            setUser(response.user)
+            localStorage.setItem("token", response.token)
+
+            console.log("User successfully retrieved")
+
+            return response
+        } catch (error) {
+            console.error("Error retrieving user: ", error)
+            throw error
+        }
         
     }
 
@@ -56,7 +74,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{token, restoreToken, login, logout}}>
+        <AuthContext.Provider value={{token, restoreToken, register, login, logout}}>
             { children }
         </AuthContext.Provider>
     )

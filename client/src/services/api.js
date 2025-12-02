@@ -89,6 +89,16 @@ export const userAPI = {
       console.error('Error authenticating user: ', error);
       throw error;
     }
+  },
+  registerUser: async (userCredentials) => {
+    try {
+      const response = await api.post(`/auth/register`, userCredentials);
+      console.log(response)
+      return response.data;
+    } catch (error) {
+      console.error('Error authenticating user: ', error);
+      throw error;
+    }
   }
 }
 
