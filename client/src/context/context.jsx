@@ -1,10 +1,27 @@
-import { createContext, useContext, useDeferredValue, useState } from "react";
+import { createContext, useContext, useDeferredValue, useEffect, useState } from "react";
 import { userAPI } from "../services/api";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null)
     const [user, setUser] = useState(null)
+
+    useEffect(() => {
+        const locallyStoredToken = localStorage.getItem("token")
+        decodeJwtForUser(locallyStoredToken)
+    }, [])
+
+    function decodeJwtForUser(token) {
+        try {
+            // Parses encoded, locally stored token
+            // from base64 to human-readable
+            // decodes user data incorporated encoded at JWT generation
+            const payload = JSON.parse(atob(token.split('.')[1]))
+            setUser(payload)
+        } catch(error) {
+            return null
+        }
+    }
 
     async function login(userCredentials) {
         try {
@@ -31,8 +48,12 @@ export const AuthProvider = ({ children }) => {
         setToken(null)
     }
 
+    function restoreToken(locallyStoredToken) {
+        setToken(locallyStoredToken)
+    }
+
     return (
-        <AuthContext.Provider value={{token, login, logout}}>
+        <AuthContext.Provider value={{token, restoreToken, login, logout}}>
             { children }
         </AuthContext.Provider>
     )

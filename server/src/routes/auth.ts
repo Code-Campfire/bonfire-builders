@@ -10,6 +10,7 @@ router.post('/login', async (req: Request, res: Response) => {
     const result = await prisma.user.findUnique({
       where: {
         email: req.body.email,
+        password_hash: req.body.password
       },
       select: {
         id: true,
