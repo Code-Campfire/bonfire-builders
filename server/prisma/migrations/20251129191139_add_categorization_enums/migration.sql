@@ -58,8 +58,10 @@ ALTER TABLE "issues"
 
 -- Step 5: Rename new columns to original names
 ALTER TABLE "issues"
-  RENAME COLUMN "category_new" TO "category",
-  RENAME COLUMN "priority_new" TO "priority",
+  RENAME COLUMN "category_new" TO "category";
+ALTER TABLE "issues"
+  RENAME COLUMN "priority_new" TO "priority";
+ALTER TABLE "issues"
   RENAME COLUMN "status_new" TO "status";
 
 -- Retain other column changes
