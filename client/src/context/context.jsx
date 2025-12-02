@@ -1,10 +1,12 @@
 import { createContext, useContext, useDeferredValue, useEffect, useState } from "react";
 import { userAPI } from "../services/api";
+import { useNavigate } from "react-router-dom";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null)
     const [user, setUser] = useState(null)
+    const navigate = useNavigate();
 
     useEffect(() => {
         const locallyStoredToken = localStorage.getItem("token")
@@ -46,6 +48,7 @@ export const AuthProvider = ({ children }) => {
     function logout() {
         localStorage.removeItem("token")
         setToken(null)
+        navigate("/login")
     }
 
     function restoreToken(locallyStoredToken) {

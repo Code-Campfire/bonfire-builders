@@ -22,12 +22,16 @@ export const LoginForm = () => {
     async function handleSubmit(e) {
         e.preventDefault();
 
+        if(!formData.email.trim() || !formData.password.trim()) {
+            throw new Error("Fields are required!")
+        }
+
         await login(formData)
 
         const locallyStoredToken = localStorage.getItem("token")
 
-        if(!locallyStoredToken) {
-           throw new Error("Token was not saved locally")  
+        if (!locallyStoredToken) {
+            throw new Error("Token was not saved locally")
         }
 
         navigate("/")
@@ -59,13 +63,13 @@ export const LoginForm = () => {
             </form>
             <div className="flex gap-3 pt-4">
                 <button
-                onClick={handleSubmit} 
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                    onClick={handleSubmit}
+                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
                 >
                     Login
                 </button>
                 <button
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
                 >
                     Register
                 </button>
