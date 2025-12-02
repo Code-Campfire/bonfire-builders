@@ -80,7 +80,6 @@ export const issueAPI = {
 
 // User API calls
 export const userAPI = {
-  // Login User
   loginUser: async (userCredentials) => {
     try {
       const response = await api.post(`/auth/login`, userCredentials);
@@ -93,16 +92,34 @@ export const userAPI = {
   registerUser: async (userCredentials) => {
     try {
       const response = await api.post(`/auth/register`, userCredentials);
-      console.log(response)
       return response.data;
     } catch (error) {
       console.error('Error authenticating user: ', error);
       throw error;
     }
+  },
+  updateUser: async (user) => {
+    try {
+      const response = await api.put(`/users/${user.id}`, user)
+      return response.data;
+    } catch (error) {
+      console.error("Error updating user")
+      throw error;
+    }
   }
 }
 
-
+export const complexAPI = {
+  createComplex: async (apartmentComplexFormData) => {
+    try {
+      const response = await api.post('/complexes', apartmentComplexFormData);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating complex in database", error)
+      throw error;
+    }
+  }
+}
 
 
 
