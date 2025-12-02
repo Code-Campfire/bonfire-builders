@@ -25,7 +25,7 @@ model User {
   complex   Complex  @relation(fields: [complex_id], references: [id])
   issues    Issue[]
   messages  Message[]
-  @@map("users")
+  @@map("users")  
 }
 
 model Complex {

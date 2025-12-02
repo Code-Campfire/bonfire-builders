@@ -6,7 +6,7 @@ export const LoginForm = () => {
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
         email: '',
-        password: ''
+        password_hash: ''
     });
     const [errors, setErrors] = useState({});
     const { login } = useAuth()
@@ -32,8 +32,8 @@ export const LoginForm = () => {
         if (!formData.email.trim()) {
             newErrors.email = 'Email is required';
         }
-        if (!formData.password.trim()) {
-            newErrors.password = 'Password is required';
+        if (!formData.password_hash.trim()) {
+            newErrors.password_hash = 'Password is required';
         }
 
         return newErrors;
@@ -47,7 +47,7 @@ export const LoginForm = () => {
             setErrors(validationErrors);
             return;
         }
-        if (!formData.email.trim() || !formData.password.trim()) {
+        if (!formData.email.trim() || !formData.password_hash.trim()) {
             throw new Error("Fields are required!")
         }
 
@@ -83,15 +83,15 @@ export const LoginForm = () => {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password: </label>
                 <input
                     type="text"
-                    value={formData.password}
-                    id="password"
-                    name="password"
+                    value={formData.password_hash}
+                    id="password_hash"
+                    name="password_hash"
                     onChange={handleChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password ? 'border-red-500' : 'border-gray-300'
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password_hash ? 'border-red-500' : 'border-gray-300'
                         }`}
                 />
-                {errors.password && (
-                    <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                {errors.password_hash && (
+                    <p className="text-red-500 text-sm mt-1">{errors.password_hash}</p>
                 )}
             </form>
             <div className="flex gap-3 pt-4">
