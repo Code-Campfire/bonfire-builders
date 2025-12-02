@@ -19,6 +19,8 @@ import {
   Building,
   Mail,
   Phone,
+  Edit,
+  Trash2,
 } from 'lucide-react';
 
 const IssueDetail = () => {
@@ -48,6 +50,22 @@ const IssueDetail = () => {
 
   const handleBack = () => {
     navigate('/issues');
+  };
+
+  const handleEdit = () => {
+    navigate(`/issues/${id}/edit`);
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this issue? This action cannot be undone.')) {
+      try {
+        await issueAPI.deleteIssue(id);
+        navigate('/issues');
+      } catch (err) {
+        console.error('Failed to delete issue:', err);
+        alert('Failed to delete issue. Please try again.');
+      }
+    }
   };
 
   if (loading) {
@@ -110,13 +128,33 @@ const IssueDetail = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-5xl mx-auto">
         {/* Back Button */}
-        <button
-          onClick={handleBack}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
-        >
-          <ArrowLeft className="h-5 w-5" />
-          Back to Issues
-        </button>
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            Back to Issues
+          </button>
+          
+          {/* Action Buttons */}
+          <div className="flex gap-3">
+            <button
+              onClick={handleEdit}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            >
+              <Edit className="h-4 w-4" />
+              Edit Issue
+            </button>
+            <button
+              onClick={handleDelete}
+              className="flex items-center gap-2 px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Issue
+            </button>
+          </div>
+        </div>
 
         {/* Main Issue Card */}
         <Card className="mb-6">
