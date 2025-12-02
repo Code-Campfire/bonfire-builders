@@ -12,8 +12,5 @@ export const ProtectedRoute = ({ children }) => {
         return <Navigate to="/login" replace />
     }
 
-    useEffect(() => {
-        restoreToken(locallyStoredToken)
-    }, [token])
     return children
 }   
