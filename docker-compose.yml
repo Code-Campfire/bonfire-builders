@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # PostgreSQL Database
@@ -23,6 +23,8 @@ services:
 
   # Backend API
   server:
+    env_file:
+      - ./server/.env
     build:
       context: ./server
       dockerfile: Dockerfile
