@@ -5,7 +5,7 @@ import { AuthRequest, authenticateToken } from '../middleware/auth';
 const router = express.Router();
 
 // GET all issues
-router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const issues = await prisma.issue.findMany();
     res.json(issues);
@@ -18,7 +18,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 });
 
 // GET all messages for a specific issue
-router.get('/:id/messages', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/:id/messages', async (req: AuthRequest, res: Response) => {
   try {
     const messages = await prisma.message.findMany({
       where: {
@@ -35,7 +35,7 @@ router.get('/:id/messages', authenticateToken, async (req: AuthRequest, res: Res
 });
 
 // GET a specific issue by ID
-router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const issue = await prisma.issue.findUnique({
       where: {
@@ -80,7 +80,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
 });
 
 // POST a new issue
-router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/', async (req: AuthRequest, res: Response) => {
   try {
     const { title, description, category, priority, location, user_id, complex_id } = req.body;
 
@@ -129,7 +129,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 });
 
 // PUT/UPDATE an issue
-router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.put('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { title, description, category, priority, status, location } = req.body;
     const issueId = Number(req.params.id);
@@ -168,7 +168,7 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
 });
 
 // DELETE an issue
-router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const issueId = Number(req.params.id);
 
