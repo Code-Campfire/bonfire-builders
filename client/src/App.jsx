@@ -1,11 +1,11 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import Issues from './Pages/Issues';
 import IssueDetail from './Pages/IssueDetail';
-import { useState } from 'react';
 import { useAuth } from './context/context';
 import { LoginForm } from './Components/authentication/LoginForm'
 import { RegistrationForm } from './Components/authentication/RegistrationForm'
 import { ProtectedRoute } from './Components/authentication/ProtectedRoute';
+import { Layout } from './Components/authentication/Logout';
 
 
 function Home() {
@@ -32,21 +32,20 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginForm />} />
       <Route path="/register" element={<RegistrationForm />} />
-      <Route path="/" element={
+      
+      <Route element={
         <ProtectedRoute>
-          <Home />
+          <Layout />
         </ProtectedRoute>
-      } />
-      <Route path="/issues" element={
-        <ProtectedRoute>
-          <Issues />
-        </ProtectedRoute>
-      } />
+      }>
+        <Route path="/" element={<Home />} />
+        <Route path="/issues" element={<Issues />} />
+      </Route>
       <Route path="/issues/:id" element={
         <ProtectedRoute>
           <IssueDetail />
         </ProtectedRoute>
-        } />
+      } />
     </Routes>
   );
 }
