@@ -99,6 +99,7 @@ export const RegistrationForm = () => {
     async function handleSubmit(e) {
         e.preventDefault();
 
+        console.log("Button clicked")
         const validationErrors = validate()
 
         if (Object.keys(validationErrors).length > 0) {
