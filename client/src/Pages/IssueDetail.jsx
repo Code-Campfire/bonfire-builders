@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader } from '../components/ui/card';
 import { StatusBadge } from '../components/StatusBadge';
 import { PriorityBadge } from '../components/PriorityBadge';
+import { PhotoUpload } from '../Components/PhotoUpload';
 import { formatCategory } from '@/utils/categoryUtils';
 import { getDaysAgo } from '@/utils/dateUtils';
 import { issueAPI } from '../services/api';
@@ -357,6 +358,11 @@ const IssueDetail = () => {
                 <p>No photos uploaded yet</p>
               </div>
             )}
+            
+            <PhotoUpload 
+              issueId={id} 
+              onUploadComplete={fetchIssueDetail}
+            />
           </CardContent>
         </Card>
 
