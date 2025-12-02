@@ -3,7 +3,7 @@ import { useAuth } from "../../context/context"
 import { useEffect } from "react";
 
 export const ProtectedRoute = ({ children }) => {
-    const { token, restoreToken } = useAuth();
+    const { token } = useAuth();
     const locallyStoredToken = localStorage.getItem("token") 
     
     // User has not authenticated
@@ -12,8 +12,5 @@ export const ProtectedRoute = ({ children }) => {
         return <Navigate to="/login" replace />
     }
 
-    useEffect(() => {
-        restoreToken(locallyStoredToken)
-    }, [token])
     return children
 }   

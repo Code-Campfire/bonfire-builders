@@ -78,12 +78,8 @@ export const AuthProvider = ({ children }) => {
         navigate("/login")
     }
 
-    function restoreToken(locallyStoredToken) {
-        setToken(locallyStoredToken)
-    }
-
     return (
-        <AuthContext.Provider value={{token, user, updateUser, restoreToken, register, login, logout}}>
+        <AuthContext.Provider value={{token, user, updateUser, register, login, logout}}>
             { children }
         </AuthContext.Provider>
     )
