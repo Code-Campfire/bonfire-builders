@@ -47,23 +47,14 @@ export const issueAPI = {
 
   // Update existing issue
   updateIssue: async (id, issueData) => {
-    try {
-      const response = await api.put(`/issues/${id}`, issueData);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating issue:', error);
-      throw error;
-    }
+    const response = await api.put(`/issues/${id}`, issueData);
+    return response.data;
   },
 
   // Delete issue
   deleteIssue: async (id) => {
-    try {
-      await api.delete(`/issues/${id}`);
-    } catch (error) {
-      console.error('Error deleting issue:', error);
-      throw error;
-    }
+    const response = await api.delete(`/issues/${id}`);
+    return response.data;
   },
 
   // Get messages for an issue

@@ -47,7 +47,16 @@ router.get('/:id', async (req: Request, res: Response) => {
             first_name: true,
             last_name: true,
             email: true,
+            phone: true,
             apartment_number: true
+          }
+        },
+        assignedTo: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            role: true
           }
         },
         complex: true,
@@ -85,30 +94,27 @@ router.post('/', async (req: Request, res: Response) => {
 
     // Validation
     if (!title || !description || !category || !priority || !location) {
-      return res.status(400).json({ 
-        error: 'Missing required fields',
-        required: ['title', 'description', 'category', 'priority', 'location']
-      });
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // TODO: In production, user_id should come from authenticated session
-    // For now, we'll use a default or passed value
-    const userId = user_id || 1; // Default to user 1 for testing
-    const complexId = complex_id || 1; // Default to complex 1 for testing
+    // Convert category and priority to uppercase to match enum
+    const normalizedCategory = category.toUpperCase().replace(/\s+/g, '_');
+    const normalizedPriority = priority.toUpperCase();
+
+    // Use defaults for user_id and complex_id for testing
+    const userId = user_id || 1;
+    const complexId = complex_id || 1;
 
     const newIssue = await prisma.issue.create({
       data: {
-        title: title.trim(),
-        description: description.trim(),
-        category,
-        priority,
-        status: 'open',
-        location: location.trim(),
+        title,
+        description,
+        category: normalizedCategory,
+        priority: normalizedPriority,
+        status: 'OPEN',
+        location,
         user_id: userId,
-        complex_id: complexId,
-        acknowledged_date: new Date(), // Temporary - should be null initially
-        resolved_date: new Date(), // Temporary - should be null initially
-        closed_date: new Date() // Temporary - should be null initially
+        complex_id: complexId
       },
       include: {
         user: {
@@ -117,10 +123,16 @@ router.post('/', async (req: Request, res: Response) => {
             first_name: true,
             last_name: true,
             email: true,
+            phone: true,
             apartment_number: true
           }
         },
-        complex: true
+        complex: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
       }
     });
 
@@ -131,21 +143,21 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
-// PUT/UPDATE an issue
+// PUT (update) an existing issue
 router.put('/:id', async (req: Request, res: Response) => {
   try {
-    const { title, description, category, priority, status, location } = req.body;
-    const issueId = Number(req.params.id);
+    const { id } = req.params;
+    const { title, description, category, priority, location, status } = req.body;
 
     const updatedIssue = await prisma.issue.update({
-      where: { id: issueId },
+      where: { id: parseInt(id) },
       data: {
-        ...(title && { title: title.trim() }),
-        ...(description && { description: description.trim() }),
-        ...(category && { category }),
-        ...(priority && { priority }),
-        ...(status && { status }),
-        ...(location && { location: location.trim() })
+        title,
+        description,
+        category,
+        priority,
+        location,
+        status
       },
       include: {
         user: {
@@ -153,19 +165,23 @@ router.put('/:id', async (req: Request, res: Response) => {
             id: true,
             first_name: true,
             last_name: true,
-            email: true
+            email: true,
+            phone: true,
+            apartment_number: true
           }
         },
-        complex: true
+        complex: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
       }
     });
 
-    res.json(updatedIssue);
+    res.status(200).json(updatedIssue);
   } catch (error: any) {
     console.error('Error updating issue:', error);
-    if (error.code === 'P2025') {
-      return res.status(404).json({ error: 'Issue not found' });
-    }
     res.status(500).json({ error: error.message });
   }
 });
@@ -173,18 +189,34 @@ router.put('/:id', async (req: Request, res: Response) => {
 // DELETE an issue
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    const issueId = Number(req.params.id);
+    const { id } = req.params;
 
+    // Check if issue exists
+    const existingIssue = await prisma.issue.findUnique({
+      where: { id: Number(id) }
+    });
+
+    if (!existingIssue) {
+      return res.status(404).json({ error: 'Issue not found' });
+    }
+
+    // Delete associated messages and photos first (cascade should handle this, but being explicit)
+    await prisma.message.deleteMany({
+      where: { issue_id: Number(id) }
+    });
+
+    await prisma.photo.deleteMany({
+      where: { issue_id: Number(id) }
+    });
+
+    // Delete the issue
     await prisma.issue.delete({
-      where: { id: issueId }
+      where: { id: Number(id) }
     });
 
     res.status(204).send();
   } catch (error: any) {
     console.error('Error deleting issue:', error);
-    if (error.code === 'P2025') {
-      return res.status(404).json({ error: 'Issue not found' });
-    }
     res.status(500).json({ error: error.message });
   }
 });

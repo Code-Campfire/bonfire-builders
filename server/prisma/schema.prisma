@@ -8,22 +8,23 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email      String @unique
-  password_hash String
-  role      String
-  first_name      String
-  last_name      String
-  phone String
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
+  password_hash    String
+  first_name       String
+  last_name        String
+  phone            String
   apartment_number String
-  building_name String
-  address String
-  move_in_date DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  issues    Issue[]
-  messages  Message[]
+  building_name    String
+  address          String
+  move_in_date     DateTime
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  role             Role      @default(TENANT)
+  issues           Issue[]   @relation("IssueCreator")
+  assignedIssues   Issue[]   @relation("AssignedIssues")
+  messages         Message[]
+
   @@map("users")
 }
 
@@ -33,63 +34,102 @@ model Complex {
   address   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   issues    Issue[]
 
   @@map("complexes")
 }
 
 model Issue {
-  id          Int      @id @default(autoincrement())
-  user_id     Int
-  complex_id  Int
-  title       String
-  description String
-  category    String
-  priority    String
-  status      String
-  location    String
-  acknowledged_date DateTime
-  resolved_date DateTime
-  closed_date DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  user        User     @relation(fields: [user_id], references: [id])
-  complex     Complex  @relation(fields: [complex_id], references: [id])
-  photos      Photo[]
-  messages    Message[]
+  id                Int       @id @default(autoincrement())
+  user_id           Int
+  complex_id        Int
+  assigned_to_id    Int?
+  title             String
+  description       String
+  location          String
+  acknowledged_date DateTime?
+  resolved_date     DateTime?
+  closed_date       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  category          Category
+  priority          Priority
+  status            Status    @default(OPEN)
+  complex           Complex   @relation(fields: [complex_id], references: [id])
+  user              User      @relation("IssueCreator", fields: [user_id], references: [id])
+  assignedTo        User?     @relation("AssignedIssues", fields: [assigned_to_id], references: [id])
+  messages          Message[]
+  photos            Photo[]
 
+  @@index([category])
+  @@index([complex_id])
+  @@index([priority])
+  @@index([status])
+  @@index([user_id])
   @@map("issues")
 }
 
 model Photo {
-  id        Int      @id @default(autoincrement())
-  issue_id  Int
-  file_path String
-  file_name String
-  file_size Int
-  mime_type String
-  caption String
+  id          Int      @id @default(autoincrement())
+  issue_id    Int
+  file_path   String
+  file_name   String
+  file_size   Int
+  mime_type   String
+  caption     String
   uploaded_at DateTime @default(now())
-
-  issue     Issue    @relation(fields: [issue_id], references: [id])
+  issue       Issue    @relation(fields: [issue_id], references: [id])
 
   @@map("photos")
 }
 
 model Message {
-  id        Int      @id @default(autoincrement())
-  issue_id  Int
-  sender_id Int
-  sender_type String
+  id           Int       @id @default(autoincrement())
+  issue_id     Int
+  sender_id    Int
+  sender_type  String
   message_text String
-  is_read Boolean
-  read_at DateTime
-  sent_at DateTime
-
-  issue     Issue    @relation(fields: [issue_id], references: [id])
-  sender    User     @relation(fields: [sender_id], references: [id])
+  is_read      Boolean   @default(false)
+  read_at      DateTime?
+  sent_at      DateTime  @default(now())
+  issue        Issue     @relation(fields: [issue_id], references: [id])
+  sender       User      @relation(fields: [sender_id], references: [id])
 
   @@map("messages")
+}
+
+enum Category {
+  PLUMBING
+  ELECTRICAL
+  HVAC
+  STRUCTURAL
+  APPLIANCE
+  PEST_CONTROL
+  LOCKS_KEYS
+  FLOORING
+  WALLS_CEILING
+  WINDOWS_DOORS
+  LANDSCAPING
+  PARKING
+  OTHER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum Role {
+  TENANT
+  LANDLORD
+  ADMIN
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
 }
