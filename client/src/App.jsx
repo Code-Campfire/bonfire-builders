@@ -1,5 +1,5 @@
 import { Routes, Route, Link } from 'react-router-dom';
-import Issues from './pages/Issues';
+import Issues from './Pages/Issues';
 import IssueDetail from './Pages/IssueDetail';
 import EditIssue from './Pages/EditIssue';
 
