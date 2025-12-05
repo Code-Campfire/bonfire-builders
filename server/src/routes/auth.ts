@@ -6,9 +6,11 @@ const router = express.Router();
 router.post('/login', async (req: Request, res: Response) => {
   // Does user exist in database?
   try {
+    console.log(req.body.email)
     const result = await prisma.user.findUnique({
       where: {
         email: req.body.email,
+        password_hash: req.body.password_hash
       },
       select: {
         id: true,
@@ -19,7 +21,7 @@ router.post('/login', async (req: Request, res: Response) => {
         phone: true,
         apartment_number: true,
         building_name: true,
-        address: true,
+        complex_id: true,
         move_in_date: true,
       }
     })
@@ -28,14 +30,13 @@ router.post('/login', async (req: Request, res: Response) => {
 
     // Creates user token
     const secret = process.env.JWT_SECRET;
-    console.log(process.env)
     if (!secret) {
       return res.status(500).json({ status: "Error", message: "JWT secret not configured on server" });
     }
 
     const token = jwt.sign(
       {
-        userId: result?.id,
+        id: result?.id,
         email: result?.email,
         role: result?.role,
         first_name: result?.first_name,
@@ -43,7 +44,7 @@ router.post('/login', async (req: Request, res: Response) => {
         phone: result?.phone,
         apartment_number: result?.apartment_number,
         building_name: result?.building_name,
-        address: result?.address,
+        complex_id: result?.complex_id,
         move_in_date: result?.move_in_date
       },
       secret,
@@ -69,6 +70,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
 router.post('/register', async (req: Request, res: Response) => {
   try {
+    console.log(req.body)
     const result = await prisma.user.create({
       data: req.body,
       // Excludes the user password in the response.
@@ -81,7 +83,7 @@ router.post('/register', async (req: Request, res: Response) => {
         phone: true,
         apartment_number: true,
         building_name: true,
-        address: true,
+        complex_id: true,
         move_in_date: true,
       }
     })
@@ -95,7 +97,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       {
-        userId: result?.id,
+        id: result?.id,
         email: result?.email,
         role: result?.role,
         first_name: result?.first_name,
@@ -103,7 +105,7 @@ router.post('/register', async (req: Request, res: Response) => {
         phone: result?.phone,
         apartment_number: result?.apartment_number,
         building_name: result?.building_name,
-        address: result?.address,
+        complex_id: result?.complex_id,
         move_in_date: result?.move_in_date
       },
       secret,

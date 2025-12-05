@@ -1,10 +1,11 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import prisma from '../lib/prisma';
+import { AuthRequest, authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 
 // GET all messages
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const messages = await prisma.message.findMany();
     res.json(messages);
@@ -17,7 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // POST a new message
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const message = await prisma.message.create({
       data: req.body
@@ -32,7 +33,7 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 // PUT a message
-router.put('/:id', async (req: Request, res: Response) => {
+router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const message = await prisma.message.update({
       where: {
@@ -50,7 +51,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 });
 
 // DELETE a message
-router.delete('/:id', async (req: Request, res: Response) => {
+router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     await prisma.message.delete({
       where: {

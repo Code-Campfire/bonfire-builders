@@ -1,37 +1,46 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Clock, Zap } from "lucide-react";
+import { AlertCircle, AlertTriangle, Info, Flame } from "lucide-react";
 
 const priorityConfig = {
   LOW: {
     label: "Low",
-    icon: Clock,
-    className: "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-300",
+    icon: Info,
+    className: "bg-gray-100 text-gray-800 border-gray-300",
   },
   MEDIUM: {
     label: "Medium",
     icon: AlertCircle,
-    className: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border border-yellow-300",
+    className: "bg-blue-100 text-blue-800 border-blue-300",
   },
   HIGH: {
     label: "High",
-    icon: Zap,
-    className: "bg-orange-100 text-orange-700 hover:bg-orange-200 border border-orange-300",
+    icon: AlertTriangle,
+    className: "bg-orange-100 text-orange-800 border-orange-300",
   },
   URGENT: {
     label: "Urgent",
-    icon: Zap,
-    className: "bg-red-100 text-red-700 hover:bg-red-200 border border-red-300",
+    icon: Flame,
+    className: "bg-red-100 text-red-800 border-red-300",
   },
 };
 
 export const PriorityBadge = ({ priority }) => {
-  const config = priorityConfig[priority];
+  // Default config if priority not found
+  const config = priorityConfig[priority] || {
+    label: priority || "Unknown",
+    icon: Info,
+    className: "bg-gray-100 text-gray-800 border-gray-300",
+  };
+
   const Icon = config.icon;
 
   return (
-    <Badge className={cn("font-medium gap-1", config.className)}>
-      <Icon className="h-3 w-3" />
+    <Badge
+      variant="outline"
+      className={cn("flex items-center gap-1", config.className)}
+    >
+      <Icon className="w-3 h-3" />
       {config.label}
     </Badge>
   );

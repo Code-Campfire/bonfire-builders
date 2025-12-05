@@ -3,6 +3,7 @@ import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import s3Client from '../lib/s3Client';
 import express, { Request, Response } from 'express';
 import prisma from '../lib/prisma';
+import { AuthRequest, authenticateToken } from '../middleware/auth';
 
 interface File {
   name: string;

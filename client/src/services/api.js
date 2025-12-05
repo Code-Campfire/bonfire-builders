@@ -10,12 +10,27 @@ const api = axios.create({
   },
 });
 
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Issue API calls
 export const issueAPI = {
   // Get all issues
   getAllIssues: async () => {
     try {
-      const response = await api.get("/issues");
+      const response = await api.get("/issues", {
+        headers: `Bearer token`,
+      });
       return response.data;
     } catch (error) {
       console.error("Error fetching issues:", error);
@@ -73,6 +88,49 @@ export const issueAPI = {
       return response.data;
     } catch (error) {
       console.error("Error fetching issue messages:", error);
+      throw error;
+    }
+  },
+};
+
+// User API calls
+export const userAPI = {
+  loginUser: async (userCredentials) => {
+    try {
+      const response = await api.post(`/auth/login`, userCredentials);
+      return response.data;
+    } catch (error) {
+      console.error("Error authenticating user: ", error);
+      throw error;
+    }
+  },
+  registerUser: async (userCredentials) => {
+    try {
+      const response = await api.post(`/auth/register`, userCredentials);
+      return response.data;
+    } catch (error) {
+      console.error("Error authenticating user: ", error);
+      throw error;
+    }
+  },
+  updateUser: async (user) => {
+    try {
+      const response = await api.put(`/users/${user.id}`, user);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating user");
+      throw error;
+    }
+  },
+};
+
+export const complexAPI = {
+  createComplex: async (apartmentComplexFormData) => {
+    try {
+      const response = await api.post("/complexes", apartmentComplexFormData);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating complex in database", error);
       throw error;
     }
   },

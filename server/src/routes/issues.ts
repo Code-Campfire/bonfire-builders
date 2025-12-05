@@ -1,10 +1,11 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import prisma from '../lib/prisma';
+import { AuthRequest, authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 
 // GET all issues
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const issues = await prisma.issue.findMany();
     res.json(issues);
@@ -17,7 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // GET all messages for a specific issue
-router.get('/:id/messages', async (req: Request, res: Response) => {
+router.get('/:id/messages', async (req: AuthRequest, res: Response) => {
   try {
     const messages = await prisma.message.findMany({
       where: {
@@ -34,7 +35,7 @@ router.get('/:id/messages', async (req: Request, res: Response) => {
 });
 
 // GET a specific issue by ID
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const issue = await prisma.issue.findUnique({
       where: {
@@ -79,7 +80,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 // POST a new issue
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', async (req: AuthRequest, res: Response) => {
   try {
     const { title, description, category, priority, location, user_id, complex_id } = req.body;
 
@@ -128,7 +129,7 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 // PUT/UPDATE an issue
-router.put('/:id', async (req: Request, res: Response) => {
+router.put('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { title, description, category, priority, status, location } = req.body;
     const issueId = Number(req.params.id);
@@ -167,7 +168,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 });
 
 // DELETE an issue
-router.delete('/:id', async (req: Request, res: Response) => {
+router.delete('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const issueId = Number(req.params.id);
 

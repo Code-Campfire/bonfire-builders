@@ -132,10 +132,10 @@ const IssueForm = ({ onSubmit, onCancel }) => {
           >
             <option value="">Select a category</option>
             <option value="PLUMBING">Plumbing</option>
-            <option value="ELECTRICAL">Electrical</option>
             <option value="HVAC">HVAC</option>
-            <option value="STRUCTURAL">Structural</option>
+            <option value="ELECTRICAL">Electrical</option>
             <option value="APPLIANCE">Appliance</option>
+            <option value="STRUCTURAL">Structural</option>
             <option value="PEST_CONTROL">Pest Control</option>
             <option value="LOCKS_KEYS">Locks & Keys</option>
             <option value="FLOORING">Flooring</option>

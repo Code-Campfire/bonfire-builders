@@ -1,6 +1,12 @@
 import { Routes, Route, Link } from 'react-router-dom';
-import Issues from './pages/Issues';
+import Issues from './Pages/Issues';
 import IssueDetail from './Pages/IssueDetail';
+import EditIssue from './Pages/EditIssue';
+import { useAuth } from './context/context';
+import { LoginForm } from './Components/authentication/LoginForm'
+import { RegistrationForm } from './Components/authentication/RegistrationForm'
+import { ProtectedRoute } from './Components/authentication/ProtectedRoute';
+import { Layout } from './Components/authentication/Logout';
 
 function Home() {
   return (
@@ -20,11 +26,39 @@ function Home() {
 }
 
 function App() {
+  const { token } = useAuth()
+
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/issues" element={<Issues />} />
-      <Route path="/issues/:id" element={<IssueDetail />} />
+      <Route path="/login" element={<LoginForm />} />
+      <Route path="/register" element={<RegistrationForm />} />
+      
+      <Route element={
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      }>
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        } />
+        <Route path="/issues" element={
+          <ProtectedRoute>
+            <Issues />
+          </ProtectedRoute>
+        } />
+      </Route>
+      <Route path="/issues/:id" element={
+        <ProtectedRoute>
+          <IssueDetail />
+        </ProtectedRoute>
+      } />
+      <Route path="/issues/:id/edit" element={
+        <ProtectedRoute>
+          <EditIssue />
+        </ProtectedRoute>
+      } />
     </Routes>
   );
 }
