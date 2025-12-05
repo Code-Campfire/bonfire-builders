@@ -1,19 +1,18 @@
 import axios from "axios";
 
-
 // Base URL for API - adjust based on environment
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,7 +29,7 @@ export const issueAPI = {
   getAllIssues: async () => {
     try {
       const response = await api.get("/issues", {
-        headers: `Bearer token`
+        headers: `Bearer token`,
       });
       return response.data;
     } catch (error) {
@@ -101,7 +100,7 @@ export const userAPI = {
       const response = await api.post(`/auth/login`, userCredentials);
       return response.data;
     } catch (error) {
-      console.error('Error authenticating user: ', error);
+      console.error("Error authenticating user: ", error);
       throw error;
     }
   },
@@ -110,33 +109,54 @@ export const userAPI = {
       const response = await api.post(`/auth/register`, userCredentials);
       return response.data;
     } catch (error) {
-      console.error('Error authenticating user: ', error);
+      console.error("Error authenticating user: ", error);
       throw error;
     }
   },
   updateUser: async (user) => {
     try {
-      const response = await api.put(`/users/${user.id}`, user)
+      const response = await api.put(`/users/${user.id}`, user);
       return response.data;
     } catch (error) {
-      console.error("Error updating user")
+      console.error("Error updating user");
       throw error;
     }
-  }
-}
+  },
+};
 
 export const complexAPI = {
   createComplex: async (apartmentComplexFormData) => {
     try {
-      const response = await api.post('/complexes', apartmentComplexFormData);
+      const response = await api.post("/complexes", apartmentComplexFormData);
       return response.data;
     } catch (error) {
-      console.error("Error creating complex in database", error)
+      console.error("Error creating complex in database", error);
       throw error;
     }
-  }
-}
+  },
+};
 
-
+// Photo API calls
+export const photoAPI = {
+  // Delete photo
+  deletePhoto: async (photoId) => {
+    try {
+      await api.delete(`/photos/${photoId}`);
+    } catch (error) {
+      console.error("Error deleting photo:", error);
+      throw error;
+    }
+  },
+  // Get presigned URLs for upload
+  getPresignedUrls: async (files) => {
+    try {
+      const response = await api.post("/photos/presigned-urls", { files });
+      return response.data;
+    } catch (error) {
+      console.error("Error getting presigned URLs:", error);
+      throw error;
+    }
+  },
+};
 
 export default api;

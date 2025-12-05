@@ -6,7 +6,7 @@ import { PriorityBadge } from '../components/PriorityBadge';
 import { PhotoUpload } from '../Components/PhotoUpload';
 import { formatCategory } from '@/utils/categoryUtils';
 import { getDaysAgo } from '@/utils/dateUtils';
-import { issueAPI } from '../services/api';
+import { issueAPI, photoAPI } from '../services/api';
 import {
   Calendar,
   Camera,
@@ -21,6 +21,7 @@ import {
   Phone,
   Edit,
   Trash2,
+  X,
 } from 'lucide-react';
 
 const IssueDetail = () => {
@@ -65,6 +66,20 @@ const IssueDetail = () => {
         console.error('Failed to delete issue:', err);
         alert('Failed to delete issue. Please try again.');
       }
+    }
+  };
+
+  const handleDeletePhoto = async (photoId) => {
+    if (!window.confirm('Are you sure you want to delete this photo?')) {
+      return;
+    }
+
+    try {
+      await photoAPI.deletePhoto(photoId);
+      await fetchIssueDetail();
+    } catch (err) {
+      console.error('Failed to delete photo:', err);
+      alert('Failed to delete photo. Please try again.');
     }
   };
 
@@ -380,13 +395,19 @@ const IssueDetail = () => {
                 {issue.photos.map((photo) => (
                   <div
                     key={photo.id}
-                    className="aspect-square bg-gray-100 rounded-lg overflow-hidden"
+                    className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden"
                   >
                     <img
                       src={photo.file_path}
                       alt={photo.caption || 'Issue photo'}
-                      className="w-full h-full object-cover"
+                      className="w-400 h-400 object-cover"
                     />
+                    <button
+                      onClick={() => handleDeletePhoto(photo.id)}
+                      className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -396,9 +417,9 @@ const IssueDetail = () => {
                 <p>No photos uploaded yet</p>
               </div>
             )}
-            
-            <PhotoUpload 
-              issueId={id} 
+
+            <PhotoUpload
+              issueId={id}
               onUploadComplete={fetchIssueDetail}
             />
           </CardContent>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { photoAPI } from '../services/api';
 
 export const PhotoUpload = ({ issueId, onUploadComplete }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -41,15 +42,7 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
         type: file.type
       }));
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/photos/presigned-urls`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ files: fileMetadata })
-      });
-
-      if (!response.ok) throw new Error('Failed to get upload URLs');
-
-      const { presignedUrls } = await response.json();
+      const { presignedUrls } = await photoAPI.getPresignedUrls(fileMetadata);
 
       // Upload each file to S3
       await Promise.all(
