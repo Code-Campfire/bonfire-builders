@@ -30,6 +30,7 @@ const IssueDetail = () => {
   const [issue, setIssue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [captionInput, setCaptionInput] = useState({})
 
   useEffect(() => {
     fetchIssueDetail();
@@ -82,6 +83,22 @@ const IssueDetail = () => {
       alert('Failed to delete photo. Please try again.');
     }
   };
+
+  const handleCaptionChange = (e) => {
+    const { id, value } = e.target
+    setCaptionInput(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  }
+
+  const handleCaptionUpdate = (e) => {
+    e.preventDefault();
+
+    const { id } = e.target
+
+    
+  }
 
   if (loading) {
     return (
@@ -151,7 +168,7 @@ const IssueDetail = () => {
             <ArrowLeft className="h-5 w-5" />
             Back to Issues
           </button>
-          
+
           {/* Action Buttons */}
           <div className="flex gap-3">
             <button
@@ -393,22 +410,51 @@ const IssueDetail = () => {
             {issue.photos && issue.photos.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {issue.photos.map((photo) => (
-                  <div
-                    key={photo.id}
-                    className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden"
-                  >
-                    <img
-                      src={photo.file_path}
-                      alt={photo.caption || 'Issue photo'}
-                      className="w-400 h-400 object-cover"
+                  <>
+                    <div
+                      key={photo.id}
+                      className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden"
+                    >
+                      <img
+                        src={photo.file_path}
+                        alt={photo.caption || 'Issue photo'}
+                        className="w-400 h-400 object-cover"
                     />
                     <button
                       onClick={() => handleDeletePhoto(photo.id)}
                       className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
-                    >
+                      >
                       <X className="h-4 w-4" />
                     </button>
-                  </div>
+                    </div>
+                    <div>
+                      <p
+                        onClick={() => "Caption clicked"}
+                      >
+                        {
+                          photo.caption
+                            ? photo.caption
+                            :
+                            <>
+                              <textarea
+                                type="text"
+                                placeholder="Caption..."
+                                id={photo.id}
+                                value={captionInput.caption}
+                                onChange={handleCaptionChange} // Handle State Change
+                              />
+                              <button
+                                id={photo.id}
+                                key={photo.id}
+                                onClick={handleCaptionUpdate} // Submit Photo Update
+                              >
+                                Add Caption
+                              </button>
+                            </>
+                        }
+                      </p>
+                    </div>
+                  </>
                 ))}
               </div>
             ) : (
