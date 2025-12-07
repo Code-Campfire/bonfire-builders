@@ -29,9 +29,7 @@ export const issueAPI = {
   // Get all issues
   getAllIssues: async () => {
     try {
-      const response = await api.get("/issues", {
-        headers: `Bearer token`
-      });
+      const response = await api.get("/issues");
       return response.data;
     } catch (error) {
       console.error("Error fetching issues:", error);

@@ -29,6 +29,7 @@ const IssueDetail = () => {
   const [issue, setIssue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [captionInput, setCaptionInput] = useState({})
 
   useEffect(() => {
     fetchIssueDetail();
@@ -67,6 +68,22 @@ const IssueDetail = () => {
       }
     }
   };
+
+  const handleCaptionChange = (e) => {
+    const { id, value } = e.target
+    setCaptionInput(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  }
+
+  const handleCaptionUpdate = (e) => {
+    e.preventDefault();
+
+    const { id } = e.target
+
+    
+  }
 
   if (loading) {
     return (
@@ -136,7 +153,7 @@ const IssueDetail = () => {
             <ArrowLeft className="h-5 w-5" />
             Back to Issues
           </button>
-          
+
           {/* Action Buttons */}
           <div className="flex gap-3">
             <button
@@ -378,16 +395,45 @@ const IssueDetail = () => {
             {issue.photos && issue.photos.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {issue.photos.map((photo) => (
-                  <div
-                    key={photo.id}
-                    className="aspect-square bg-gray-100 rounded-lg overflow-hidden"
-                  >
-                    <img
-                      src={photo.file_path}
-                      alt={photo.caption || 'Issue photo'}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                  <>
+                    <div
+                      key={photo.id}
+                      className="aspect-square bg-gray-100 rounded-lg overflow-hidden"
+                    >
+                      <img
+                        src={photo.file_path}
+                        alt={photo.caption || 'Issue photo'}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <p
+                        onClick={() => "Caption clicked"}
+                      >
+                        {
+                          photo.caption
+                            ? photo.caption
+                            :
+                            <>
+                              <textarea
+                                type="text"
+                                placeholder="Caption..."
+                                id={photo.id}
+                                value={captionInput.caption}
+                                onChange={handleCaptionChange} // Handle State Change
+                              />
+                              <button
+                                id={photo.id}
+                                key={photo.id}
+                                onClick={handleCaptionUpdate} // Submit Photo Update
+                              >
+                                Add Caption
+                              </button>
+                            </>
+                        }
+                      </p>
+                    </div>
+                  </>
                 ))}
               </div>
             ) : (
@@ -396,9 +442,9 @@ const IssueDetail = () => {
                 <p>No photos uploaded yet</p>
               </div>
             )}
-            
-            <PhotoUpload 
-              issueId={id} 
+
+            <PhotoUpload
+              issueId={id}
               onUploadComplete={fetchIssueDetail}
             />
           </CardContent>
