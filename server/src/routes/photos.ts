@@ -4,6 +4,7 @@ import s3Client from '../lib/s3Client';
 import express, { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import { AuthRequest, authenticateToken } from '../middleware/auth';
+import { triggerAsyncId } from 'async_hooks';
 
 interface File {
   name: string;
@@ -98,6 +99,50 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 // PUT a photo
+router.put("/:photoId", async (req: AuthRequest, res: Response) => {
+  try {
+    const uniquePhoto = await prisma.photo.findUnique({
+      where: {
+        id: Number(req.body.id)
+      }
+    })
+
+    // Validates photo's existence
+    if(uniquePhoto === null){
+      return res.status(404).json({
+        message: "There is no photo with the ID: " + req.body.id
+      })
+    }
+
+    const updatedPhoto = await prisma.photo.update({
+      data: req.body,
+      where: {
+        id: Number(req.body.id)
+      },
+      select: {
+        id: true,
+        issue_id: true,
+        file_path: true,
+        file_name: true,
+        file_size: true,
+        mime_type: true,
+        caption: true,
+        uploaded_at:true
+      }
+    })
+
+    return res.status(201).json({
+      message: "Photo successfully updated",
+      photo: updatedPhoto
+    })
+  } catch(error: any) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: "ERROR: " + error.message
+    })
+  }
+})
+
 // DELETE a photo
 
 export default router;

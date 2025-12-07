@@ -6,7 +6,7 @@ import { PriorityBadge } from '../components/PriorityBadge';
 import { PhotoUpload } from '../Components/PhotoUpload';
 import { formatCategory } from '@/utils/categoryUtils';
 import { getDaysAgo } from '@/utils/dateUtils';
-import { issueAPI } from '../services/api';
+import { issueAPI, photoAPI } from '../services/api';
 import {
   Calendar,
   Camera,
@@ -77,12 +77,12 @@ const IssueDetail = () => {
     }));
   }
 
-  const handleCaptionUpdate = (e) => {
+  const handleCaptionUpdate = async (e) => {
     e.preventDefault();
 
     const { id } = e.target
 
-    
+    await photoAPI.updatePhoto()
   }
 
   if (loading) {

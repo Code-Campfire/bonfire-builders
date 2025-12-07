@@ -92,6 +92,19 @@ export const issueAPI = {
   },
 };
 
+// Photo API calls
+export const photoAPI = {
+  updatePhoto: async (photo) => {
+    try{
+      const response = await api.put(`/photos/${photo.id}`, photo)
+      return response.data
+    } catch (error) {
+      console.error("Error updating photo", error)
+      throw error
+    }
+  }
+}
+
 // User API calls
 export const userAPI = {
   loginUser: async (userCredentials) => {
