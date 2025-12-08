@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../context/context"
 import { useNavigate } from "react-router-dom";
+import { EyeOff, Eye } from "lucide-react";
 
 export const LoginForm = () => {
     const navigate = useNavigate()
@@ -9,6 +10,7 @@ export const LoginForm = () => {
         password_hash: ''
     });
     const [errors, setErrors] = useState({});
+    const [showPassword, setShowPassword] = useState(false);
     const { login } = useAuth()
 
     function handleChange(e) {
@@ -80,8 +82,9 @@ export const LoginForm = () => {
                 )}
                 <br />
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password: </label>
+                <div className="flex flex-row">
                 <input
-                    type="text"
+                    type={showPassword ? 'text': 'password'}
                     value={formData.password_hash}
                     id="password_hash"
                     name="password_hash"
@@ -89,6 +92,8 @@ export const LoginForm = () => {
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password_hash ? 'border-red-500' : 'border-gray-300'
                         }`}
                 />
+                <button type="button" className="m-2" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff /> : <Eye />}</button>
+                </div>
                 {errors.password_hash && (
                     <p className="text-red-500 text-sm mt-1">{errors.password_hash}</p>
                 )}
