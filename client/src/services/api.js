@@ -28,9 +28,7 @@ export const issueAPI = {
   // Get all issues
   getAllIssues: async () => {
     try {
-      const response = await api.get("/issues", {
-        headers: `Bearer token`,
-      });
+      const response = await api.get("/issues");
       return response.data;
     } catch (error) {
       console.error("Error fetching issues:", error);
@@ -157,6 +155,15 @@ export const photoAPI = {
       throw error;
     }
   },
+    updatePhoto: async (photo) => {
+    try{
+      const response = await api.put(`/photos/${photo.id}`, photo)
+      return response.data
+    } catch (error) {
+      console.error("Error updating photo", error)
+      throw error
+    }
+  }
 };
 
 export default api;

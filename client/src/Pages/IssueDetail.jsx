@@ -83,6 +83,50 @@ const IssueDetail = () => {
     }
   };
 
+  const handleCaptionChange = (e) => {
+    // Destructs the id and value keys from the input
+    const { id, value } = e.target
+
+    // Separates photos from the issue object
+    const photosArray = issue.photos;
+
+    // Filters photos by id
+    let filteredPhotoArray = photosArray.filter((photo) => {
+      return photo.id === parseInt(id)
+    })
+
+    // Extracts unique photo from filter array
+    const uniquePhoto = filteredPhotoArray[0]
+
+    // Updates caption property on the unique photo
+    uniquePhoto.caption = value
+  }
+
+  const handleCaptionUpdate = async (e) => {
+
+    // Prevents page refresh before API call
+    e.preventDefault();
+
+    // Destructs id from button input
+    const { id } = e.target
+
+    // Separates photos from the issue object
+    const photosArray = issue.photos;
+
+    // Filters photos by id
+    let filteredPhotoArray = photosArray.filter((photo) => {
+      return photo.id === parseInt(id)
+    })
+
+    // Extracts unique photo from filter array
+    const uniquePhoto = filteredPhotoArray[0]
+
+    // Sends unique photo to be updated in database
+    await photoAPI.updatePhoto(uniquePhoto)
+
+    fetchIssueDetail()
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
@@ -151,7 +195,7 @@ const IssueDetail = () => {
             <ArrowLeft className="h-5 w-5" />
             Back to Issues
           </button>
-          
+
           {/* Action Buttons */}
           <div className="flex gap-3">
             <button
@@ -393,21 +437,43 @@ const IssueDetail = () => {
             {issue.photos && issue.photos.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {issue.photos.map((photo) => (
-                  <div
-                    key={photo.id}
-                    className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden"
-                  >
-                    <img
-                      src={photo.file_path}
-                      alt={photo.caption || 'Issue photo'}
-                      className="w-400 h-400 object-cover"
+                  <div key={photo.id} className="space-y-2">
+                    <div className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                      <img
+                        src={photo.file_path}
+                        alt={photo.caption || 'Issue photo'}
+                        className="w-400 h-400 object-cover"
                     />
                     <button
                       onClick={() => handleDeletePhoto(photo.id)}
                       className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
-                    >
+                      >
                       <X className="h-4 w-4" />
                     </button>
+                    </div>
+                    <div>
+                      {photo.caption ? (
+                        <div className="text-sm text-gray-700">
+                          {photo.caption}
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <textarea
+                            className="w-full text-sm p-2 border rounded"
+                            placeholder="Caption..."
+                            id={photo.id}
+                            onChange={handleCaptionChange}
+                          />
+                          <button
+                            id={photo.id}
+                            className="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            onClick={handleCaptionUpdate}
+                          >
+                            Add Caption
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
