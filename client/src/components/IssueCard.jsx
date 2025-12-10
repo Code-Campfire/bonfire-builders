@@ -15,6 +15,16 @@ import {
 } from "@/components/ui/tooltip"
 
 const IssueCard = ({ issue = mockIssue }) => {
+  function standardizeIssueDescriptionLength(issueDescription){
+    const descriptionCharacterLimit = 47;
+    let shortenedDescription = "";
+
+    for(let i = 0; i < descriptionCharacterLimit; i++){
+      shortenedDescription += issueDescription[i]
+    }
+
+    return shortenedDescription + "...";
+  }
   return (
     <Link to={`/issues/${issue.id}`}>
       <Card className={`hover:border-primary/50 transition-all hover:shadow-md cursor-pointer ${issue.status === 'CLOSED' ? 'opacity-70' : ''}`}>
@@ -22,7 +32,7 @@ const IssueCard = ({ issue = mockIssue }) => {
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-lg mb-1 truncate">{issue.title}</h3>
-              <p className="text-sm text-muted-foreground line-clamp-2">{issue.description}</p>
+              <p className="text-sm text-muted-foreground line-clamp-2">{standardizeIssueDescriptionLength(issue.description)}</p>
             </div>
             <div className="flex flex-col gap-2 items-end shrink-0">
               <StatusBadge status={issue.status} />
