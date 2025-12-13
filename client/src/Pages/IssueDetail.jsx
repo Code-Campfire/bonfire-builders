@@ -22,7 +22,8 @@ import {
   Edit,
   Trash2,
   X,
-} from "lucide-react";
+} from 'lucide-react';
+import { Messages } from '../Components/messaging/Messages';
 
 const IssueDetail = () => {
   const { id } = useParams();
@@ -532,40 +533,7 @@ const IssueDetail = () => {
             </h2>
           </CardHeader>
           <CardContent>
-            {issue.messages && issue.messages.length > 0 ? (
-              <div className="space-y-4">
-                {issue.messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className="p-4 bg-gray-50 rounded-lg border border-gray-200"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">
-                          {message.sender?.first_name}{" "}
-                          {message.sender?.last_name}
-                        </span>
-                        <span className="px-2 py-0.5 bg-gray-200 rounded text-xs">
-                          {message.sender?.role}
-                        </span>
-                      </div>
-                      <span className="text-sm text-gray-500">
-                        {new Date(message.sent_at).toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="text-gray-700 whitespace-pre-wrap">
-                      {message.message_text}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <MessageSquare className="h-12 w-12 mx-auto mb-2 text-gray-400" />
-                <p>No messages yet</p>
-              </div>
-            )}
+           <Messages issue={issue}/>
           </CardContent>
         </Card>
       </div>
