@@ -89,6 +89,20 @@ export const issueAPI = {
       throw error;
     }
   },
+
+  // Send a message for an issue
+  sendMessage: async (issueId, messageText) => {
+    try {
+      const response = await api.post('/messages', {
+        issue_id: issueId,
+        message_text: messageText
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error sending message:', error);
+      throw error;
+    }
+  },
 };
 
 // User API calls

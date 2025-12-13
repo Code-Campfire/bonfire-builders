@@ -27,7 +27,10 @@ router.post('/login', async (req: Request, res: Response) => {
     })
 
     // Yes, user exists in database
-
+    if(result === null) {
+      return res.status(403).json({ status: "Error", message: "User does not exist in the database" });
+    }
+    
     // Creates user token
     const secret = process.env.JWT_SECRET;
     if (!secret) {
