@@ -26,11 +26,12 @@ router.post('/login', async (req: Request, res: Response) => {
       }
     })
 
-    // Yes, user exists in database
+    // Validates that a unique user was found
     if(result === null) {
       return res.status(403).json({ status: "Error", message: "User does not exist in the database" });
     }
-    
+
+    // Yes, user exists in database
     // Creates user token
     const secret = process.env.JWT_SECRET;
     if (!secret) {
