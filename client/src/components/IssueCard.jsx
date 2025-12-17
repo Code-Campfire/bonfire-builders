@@ -19,6 +19,9 @@ const IssueCard = ({ issue = mockIssue }) => {
     const descriptionCharacterLimit = 47;
     let shortenedDescription = "";
 
+    if(issueDescription.length < descriptionCharacterLimit) {
+      return issueDescription
+    }
     for(let i = 0; i < descriptionCharacterLimit; i++){
       shortenedDescription += issueDescription[i]
     }
@@ -27,7 +30,7 @@ const IssueCard = ({ issue = mockIssue }) => {
   }
   return (
     <Link to={`/issues/${issue.id}`}>
-      <Card className={`hover:border-primary/50 transition-all hover:shadow-md cursor-pointer ${issue.status === 'CLOSED' ? 'opacity-70' : ''}`}>
+      <Card className={`min-w-[24rem] hover:border-primary/50 transition-all hover:shadow-md cursor-pointer ${issue.status === 'CLOSED' ? 'opacity-70' : ''}`}>
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
