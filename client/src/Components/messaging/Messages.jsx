@@ -4,7 +4,7 @@ import { issueAPI } from '../../services/api';
 import { MessageSquare, User } from "lucide-react"
 import { useAuth } from '../../context/context';
 
-export const Messages = ({ issue, fetchIssueDetail }) => {
+export const Messages = ({ issue }) => {
   const [messages, setMessages] = useState(issue.messages || []);
   const [newMessage, setNewMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
