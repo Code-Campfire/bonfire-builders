@@ -18,7 +18,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 });
 
 // POST a new message
-router.post('/', async (req: AuthRequest, res: Response) => {
+router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { issue_id, message_text, sender_id, sender_role } = req.body
     // Validate issue exists and user has access
