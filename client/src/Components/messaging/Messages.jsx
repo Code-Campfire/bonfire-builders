@@ -41,7 +41,6 @@ export const Messages = ({ issue, fetchIssueDetail }) => {
     try {
       const response = await issueAPI.sendMessage(messageBody);
       setNewMessage('');
-      fetchIssueDetail();
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
