@@ -7,7 +7,36 @@ const router = express.Router();
 // GET all issues
 router.get('/', async (req: AuthRequest, res: Response) => {
   try {
-    const issues = await prisma.issue.findMany();
+    const issues = await prisma.issue.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            email: true,
+            apartment_number: true,
+            building_name: true
+          }
+        },
+        complex: {
+          select: {
+            id: true,
+            name: true,
+            address: true
+          }
+        },
+        _count: {
+          select: {
+            photos: true,
+            messages: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
     res.json(issues);
   } catch (error: any) {
     console.error('Error fetching issues:', error);
@@ -48,7 +77,9 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
             first_name: true,
             last_name: true,
             email: true,
-            apartment_number: true
+            apartment_number: true,
+            building_name: true,
+            phone: true
           }
         },
         complex: true,
@@ -80,9 +111,9 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
 });
 
 // POST a new issue
-router.post('/', async (req: AuthRequest, res: Response) => {
+router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, category, priority, location, user_id, complex_id } = req.body;
+    const { title, description, category, priority, location } = req.body;
 
     // Validation
     if (!title || !description || !category || !priority || !location) {
@@ -92,10 +123,22 @@ router.post('/', async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // TODO: In production, user_id should come from authenticated session
-    // For now, we'll use a default or passed value
-    const userId = user_id || 1; // Default to user 1 for testing
-    const complexId = complex_id || 1; // Default to complex 1 for testing
+    // Get user_id and complex_id from authenticated user
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    // Fetch the user's current complex_id from database to ensure it's up-to-date
+    // (JWT may have stale data if user was updated after token was issued)
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { complex_id: true }
+    });
+
+    if (!user || !user.complex_id) {
+      return res.status(400).json({ error: 'User missing complex assignment' });
+    }
 
     const newIssue = await prisma.issue.create({
       data: {
@@ -105,7 +148,7 @@ router.post('/', async (req: AuthRequest, res: Response) => {
         priority,
         location: location.trim(),
         user_id: userId,
-        complex_id: complexId
+        complex_id: user.complex_id
       },
       include: {
         user: {
@@ -171,6 +214,15 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
 router.delete('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const issueId = Number(req.params.id);
+
+    // Delete associated records first to avoid foreign key constraint violations
+    await prisma.message.deleteMany({
+      where: { issue_id: issueId }
+    });
+
+    await prisma.photo.deleteMany({
+      where: { issue_id: issueId }
+    });
 
     await prisma.issue.delete({
       where: { id: issueId }

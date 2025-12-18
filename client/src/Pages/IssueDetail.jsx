@@ -319,6 +319,9 @@ const IssueDetail = () => {
                 </h2>
                 <div className="text-sm">
                   <div className="font-medium">{issue.complex.name}</div>
+                  {issue.user?.building_name && (
+                    <div className="text-gray-700">Building: {issue.user.building_name}</div>
+                  )}
                   <div className="text-gray-600">{issue.complex.address}</div>
                 </div>
               </div>

@@ -51,11 +51,11 @@ const IssueCard = ({ issue = mockIssue }) => {
             </span>
             <span className="inline-flex items-center gap-1">
               <MessageSquare className="h-4 w-4" />
-              {issue.messageCount}
+              {issue._count?.messages || 0}
             </span>
             <span className="inline-flex items-center gap-1">
               <Camera className="h-4 w-4" />
-              {issue.photoCount}
+              {issue._count?.photos || 0}
             </span>
             {issue.acknowledged_date && (
               <TooltipProvider>
@@ -75,8 +75,10 @@ const IssueCard = ({ issue = mockIssue }) => {
 
           <div className="flex items-center gap-2 text-sm">
             <User className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium">{issue.tenantName}</span>
-            <span className="text-muted-foreground">• {issue.propertyAddress}</span>
+            <span className="font-medium">
+              {issue.user?.first_name} {issue.user?.last_name}
+            </span>
+            <span className="text-muted-foreground">• {issue.complex?.address || 'N/A'}</span>
           </div>
 
           <div className="flex items-center justify-between text-sm">

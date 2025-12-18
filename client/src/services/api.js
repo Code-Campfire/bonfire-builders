@@ -134,6 +134,15 @@ export const userAPI = {
 };
 
 export const complexAPI = {
+  getAllComplexes: async () => {
+    try {
+      const response = await api.get("/complexes");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching complexes:", error);
+      throw error;
+    }
+  },
   createComplex: async (apartmentComplexFormData) => {
     try {
       const response = await api.post("/complexes", apartmentComplexFormData);
