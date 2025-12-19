@@ -172,7 +172,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 });
 
 // PUT/UPDATE an issue (requires authentication and ownership or landlord role)
-router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.put('/:id', authenticateToken, authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { title, description, category, priority, status, location } = req.body;
     const issueId = Number(req.params.id);
@@ -199,16 +199,43 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
       });
     }
 
+    // Fetch current issue to check existing dates
+    const currentIssue = await prisma.issue.findUnique({
+      where: { id: issueId },
+      select: { acknowledged_date: true, resolved_date: true, closed_date: true }
+    });
+
+    if (!currentIssue) {
+      return res.status(404).json({ error: 'Issue not found' });
+    }
+
+    // Check if user is landlord/admin
+    if (req.user?.role !== 'LANDLORD' && req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Only landlords can update issue status' });
+    }
+
+    // Prepare update data
+    const updateData: any = {
+      ...(title && { title: title.trim() }),
+      ...(description && { description: description.trim() }),
+      ...(category && { category }),
+      ...(priority && { priority }),
+      ...(status && { status }),
+      ...(location && { location: location.trim() })
+    };
+
+    // Set date fields based on status
+    if (status === 'IN_PROGRESS' && !currentIssue.acknowledged_date) {
+      updateData.acknowledged_date = new Date();
+    } else if (status === 'RESOLVED' && !currentIssue.resolved_date) {
+      updateData.resolved_date = new Date();
+    } else if (status === 'CLOSED' && !currentIssue.closed_date) {
+      updateData.closed_date = new Date();
+    }
+
     const updatedIssue = await prisma.issue.update({
       where: { id: issueId },
-      data: {
-        ...(title && { title: title.trim() }),
-        ...(description && { description: description.trim() }),
-        ...(category && { category }),
-        ...(priority && { priority }),
-        ...(status && { status }),
-        ...(location && { location: location.trim() })
-      },
+      data: updateData,
       include: {
         user: {
           select: {
