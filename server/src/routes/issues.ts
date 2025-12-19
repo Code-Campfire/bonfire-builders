@@ -172,7 +172,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 });
 
 // PUT/UPDATE an issue (requires authentication and ownership or landlord role)
-router.put('/:id', authenticateToken, authenticateToken, async (req: AuthRequest, res: Response) => {
+router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { title, description, category, priority, status, location } = req.body;
     const issueId = Number(req.params.id);
@@ -207,11 +207,6 @@ router.put('/:id', authenticateToken, authenticateToken, async (req: AuthRequest
 
     if (!currentIssue) {
       return res.status(404).json({ error: 'Issue not found' });
-    }
-
-    // Check if user is landlord/admin
-    if (req.user?.role !== 'LANDLORD' && req.user?.role !== 'ADMIN') {
-      return res.status(403).json({ error: 'Only landlords can update issue status' });
     }
 
     // Prepare update data
