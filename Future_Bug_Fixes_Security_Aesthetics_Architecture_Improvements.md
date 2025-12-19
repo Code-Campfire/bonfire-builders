@@ -9,31 +9,32 @@
 ## 🔴 CRITICAL SECURITY ITEMS (Implement First)
 
 ### Authentication & Authorization
-- [ ] **Implement password hashing with bcrypt**
-  - Install bcrypt package
-  - Hash passwords during user registration
-  - Compare hashed passwords during login
-  - Update seed data to use hashed passwords
-  - Migrate existing plain-text passwords
+- [✅] **Implement password hashing with bcrypt**
+  - ✅ Install bcrypt package
+  - ✅ Hash passwords during user registration
+  - ✅ Compare hashed passwords during login
+  - ✅ Update seed data to use hashed passwords
+  - ✅ Migrate existing plain-text passwords (database seeded successfully)
 
-- [ ] **Add authorization checks to all protected routes**
-  - Audit all API endpoints for missing auth checks
-  - Implement role-based access control (RBAC)
-  - Add resource ownership verification
-  - Protect sensitive endpoints (admin-only routes)
+- [✅] **Add authorization checks to all protected routes**
+  - ✅ Audit all API endpoints for missing auth checks
+  - ✅ Implement role-based access control (RBAC)
+  - ✅ Add resource ownership verification
+  - ✅ Protect sensitive endpoints (admin-only routes)
 
-- [ ] **Fix authentication middleware - apply consistently**
-  - Review current auth middleware implementation
-  - Apply middleware to all protected routes
-  - Ensure consistent error responses
-  - Add middleware to route groups/routers
+- [✅] **Fix authentication middleware - apply consistently**
+  - ✅ Review current auth middleware implementation
+  - ✅ Apply middleware to all protected routes
+  - ✅ Ensure consistent error responses
+  - ✅ Add middleware to route groups/routers
 
-- [ ] **Remove hardcoded credentials and sensitive data**
-  - Audit codebase for hardcoded secrets
-  - Move all credentials to environment variables
-  - Remove any API keys, tokens, or passwords from code
-  - Update .gitignore to prevent credential leaks
-  - Create .env.example files with dummy values
+- [✅] **Remove hardcoded credentials and sensitive data**
+  - ✅ Audit codebase for hardcoded secrets
+  - ✅ Move all credentials to environment variables
+  - ✅ Remove any API keys, tokens, or passwords from code
+  - ✅ Update .gitignore to prevent credential leaks
+  - ✅ Create .env.example files with dummy values
+  - ⚠️ **ACTION REQUIRED:** Rotate exposed AWS credentials (see SECURITY_ALERT.md)
 
 ### Input Validation
 - [ ] **Add input validation with Zod or Yup**
@@ -48,13 +49,27 @@
 ## 🟠 HIGH PRIORITY IMPROVEMENTS
 
 ### Frontend Architecture
-- [ ] **Convert frontend to TypeScript**
-  - Rename .jsx files to .tsx
-  - Add type definitions for all components
-  - Type all props and state
-  - Add types for API responses
-  - Configure strict TypeScript settings
-  - Fix all type errors incrementally
+- [ ] **Convert frontend to TypeScript - Phase 1: Setup & Configuration**
+  - Install TypeScript and type definitions
+  - Configure tsconfig.json
+  - Set up build pipeline
+  - Convert 1-2 simple files as proof of concept
+
+- [ ] **Convert frontend to TypeScript - Phase 2: Core Components**
+  - Convert authentication components
+  - Convert common UI components (cards, badges, etc.)
+  - Type shared utilities
+
+- [ ] **Convert frontend to TypeScript - Phase 3: Page Components**
+  - Convert Issues page
+  - Convert IssueDetail page
+  - Convert EditIssue page
+
+- [ ] **Convert frontend to TypeScript - Phase 4: API Types & Final Cleanup**
+  - Create API response types
+  - Type all API calls
+  - Fix remaining errors
+  - Enable strict mode
 
 ### Backend Architecture
 - [ ] **Implement service layer on backend**

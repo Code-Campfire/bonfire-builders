@@ -4,8 +4,8 @@ import { AuthRequest, authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 
-// GET all issues
-router.get('/', async (req: AuthRequest, res: Response) => {
+// GET all issues (requires authentication)
+router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const issues = await prisma.issue.findMany({
       include: {
@@ -46,8 +46,8 @@ router.get('/', async (req: AuthRequest, res: Response) => {
   }
 });
 
-// GET all messages for a specific issue
-router.get('/:id/messages', async (req: AuthRequest, res: Response) => {
+// GET all messages for a specific issue (requires authentication)
+router.get('/:id/messages', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const messages = await prisma.message.findMany({
       where: {
@@ -63,8 +63,8 @@ router.get('/:id/messages', async (req: AuthRequest, res: Response) => {
   }
 });
 
-// GET a specific issue by ID
-router.get('/:id', async (req: AuthRequest, res: Response) => {
+// GET a specific issue by ID (requires authentication)
+router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const issue = await prisma.issue.findUnique({
       where: {
@@ -171,11 +171,33 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   }
 });
 
-// PUT/UPDATE an issue
-router.put('/:id', async (req: AuthRequest, res: Response) => {
+// PUT/UPDATE an issue (requires authentication and ownership or landlord role)
+router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { title, description, category, priority, status, location } = req.body;
     const issueId = Number(req.params.id);
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    // Verify issue exists and check ownership
+    const existingIssue = await prisma.issue.findUnique({
+      where: { id: issueId },
+      select: { user_id: true }
+    });
+
+    if (!existingIssue) {
+      return res.status(404).json({ error: 'Issue not found' });
+    }
+
+    // Only the issue owner or landlord can update
+    if (req.user?.role !== 'LANDLORD' && existingIssue.user_id !== userId) {
+      return res.status(403).json({ 
+        error: 'You do not have permission to update this issue' 
+      });
+    }
 
     const updatedIssue = await prisma.issue.update({
       where: { id: issueId },
@@ -210,10 +232,32 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
   }
 });
 
-// DELETE an issue
-router.delete('/:id', async (req: AuthRequest, res: Response) => {
+// DELETE an issue (requires authentication and ownership or landlord role)
+router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const issueId = Number(req.params.id);
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    // Verify issue exists and check ownership
+    const existingIssue = await prisma.issue.findUnique({
+      where: { id: issueId },
+      select: { user_id: true }
+    });
+
+    if (!existingIssue) {
+      return res.status(404).json({ error: 'Issue not found' });
+    }
+
+    // Only the issue owner or landlord can delete
+    if (req.user?.role !== 'LANDLORD' && existingIssue.user_id !== userId) {
+      return res.status(403).json({ 
+        error: 'You do not have permission to delete this issue' 
+      });
+    }
 
     // Delete associated records first to avoid foreign key constraint violations
     await prisma.message.deleteMany({
