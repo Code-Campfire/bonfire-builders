@@ -24,17 +24,28 @@ import {
   X,
 } from 'lucide-react';
 import { Messages } from '../Components/messaging/Messages';
+import { useAuth } from '../context/context';
 
 const IssueDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [issue, setIssue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     fetchIssueDetail();
   }, [id]);
+
+  useEffect(() => {
+    if (issue) {
+      const allowedStatuses = ['IN_PROGRESS', 'RESOLVED', 'CLOSED'];
+      setSelectedStatus(allowedStatuses.includes(issue.status) ? issue.status : '');
+    }
+  }, [issue]);
 
   const fetchIssueDetail = async () => {
     try {
@@ -138,6 +149,22 @@ const IssueDetail = () => {
         photo.id === uniquePhoto.id ? uniquePhoto : photo
       ),
     }));
+  };
+
+  const handleStatusUpdate = async () => {
+    if (!selectedStatus || selectedStatus === issue.status) return;
+
+    try {
+      setUpdatingStatus(true);
+      await issueAPI.updateIssue(id, { status: selectedStatus });
+      await fetchIssueDetail();
+      alert('Status updated successfully');
+    } catch (err) {
+      console.error('Failed to update status:', err);
+      alert('Failed to update status. Please try again.');
+    } finally {
+      setUpdatingStatus(false);
+    }
   };
 
   if (loading) {
@@ -328,6 +355,36 @@ const IssueDetail = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Status Update Card */}
+        {user?.role === 'LANDLORD' && (
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-xl font-bold">Update Status</h2>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 items-center">
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="px-3 py-2 border rounded-md"
+                >
+                  <option value="">Select new status</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="RESOLVED">Resolved</option>
+                  <option value="CLOSED">Closed</option>
+                </select>
+                <button
+                  onClick={handleStatusUpdate}
+                  disabled={updatingStatus || !selectedStatus || selectedStatus === issue?.status}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {updatingStatus ? 'Updating...' : 'Update Status'}
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Timeline Card */}
         <Card className="mb-6">
