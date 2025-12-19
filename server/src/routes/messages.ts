@@ -20,15 +20,40 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 // POST a new message
 router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const message = await prisma.message.create({
-      data: req.body
+    const { issue_id, message_text, sender_id, sender_role } = req.body
+    // Validate issue exists and user has access
+    const issue = await prisma.issue.findUnique({
+      where:  {id: issue_id} ,
+      include: { user: true, complex: true }
     });
+
+    if (!issue) {
+      return res.status(404).json({ error: 'Issue not found' });
+    }
+
+
+    const message = await prisma.message.create({
+      data: req.body,
+      include: {
+        sender: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            role: true
+          }
+        }
+      }
+    });
+
+    // Emit real-time event
+    const io = req.app.get('io');
+    io.to(`issue-${issue_id}`).emit('new-message', message);
+
     res.status(201).json(message);
   } catch (error: any) {
     console.error('Error creating message:', error);
-    res.status(500).json({
-      error: error.message
-    });
+    res.status(500).json({ error: error.message });
   }
 });
 

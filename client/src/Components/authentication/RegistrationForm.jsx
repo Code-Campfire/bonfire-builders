@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../context/context"
 import { useNavigate } from "react-router-dom";
 import { complexAPI, userAPI } from "../../services/api";
+import { EyeOff, Eye } from "lucide-react";
 
 export const RegistrationForm = () => {
     const navigate = useNavigate()
     const { register, user, updateUser } = useAuth();
+    const [showPassword, setShowPassword] = useState(false);
     const [userFormData, setUserFormData] = useState({
         email: '',
         password_hash: '',
@@ -13,7 +15,7 @@ export const RegistrationForm = () => {
         first_name: '',
         last_name: '',
         phone: '',  
-        complex_id: 1,
+        complex_id: 1, // Temporary default - will be updated for landlords after complex creation
         apartment_number: '',
         building_name: '',
         move_in_date: new Date().toISOString(),
@@ -29,13 +31,31 @@ export const RegistrationForm = () => {
 
     });
     const [errors, setErrors] = useState({});
+    const [complexes, setComplexes] = useState([]);
+    const [loadingComplexes, setLoadingComplexes] = useState(true);
     const { login } = useAuth()
+
+    useEffect(() => {
+        fetchComplexes();
+    }, []);
+
+    async function fetchComplexes() {
+        try {
+            setLoadingComplexes(true);
+            const data = await complexAPI.getAllComplexes();
+            setComplexes(data);
+        } catch (error) {
+            console.error('Failed to fetch complexes:', error);
+        } finally {
+            setLoadingComplexes(false);
+        }
+    }
 
     function handleUserChange(e) {
         const { name, value } = e.target
         setUserFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: name === 'complex_id' ? parseInt(value) || 1 : value
         }))
 
         if (errors[name]) {
@@ -84,9 +104,13 @@ export const RegistrationForm = () => {
         if (!userFormData.apartment_number.trim() && userFormData.role !== "LANDLORD") {
             newErrors.apartment_number = 'Apartment number is required';
         }
-        if (!userFormData.building_name.trim() && userFormData.role !== "LANDLORD") {
-            newErrors.building_name = 'Building name is required';
+
+        // Validate complex_id for tenants
+        if (userFormData.role === "TENANT" && (!userFormData.complex_id || userFormData.complex_id === "")) {
+            newErrors.complex_id = 'Please select a property/complex';
         }
+
+        // building_name is now optional for all users
         if (!landlordComplexFormData.name.trim() && userFormData.role !== "TENANT") {
             newErrors.name = 'Complex name is required';
         }
@@ -99,45 +123,51 @@ export const RegistrationForm = () => {
     async function handleSubmit(e) {
         e.preventDefault();
 
-        const validationErrors = validate()
+        try {
+            const validationErrors = validate()
 
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
-        }
+            if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                return;
+            }
 
-        // Sends userFormData to context file before API call
-        // Returns registered user information
-        const registeredUser = await register(userFormData)
+            // Sends userFormData to context file before API call
+            // Returns registered user information
+            const registeredUser = await register(userFormData)
 
-        // Only in the case of registering a landlord
-        if(userFormData.role === "LANDLORD") {
+            // Only in the case of registering a landlord
+            if(userFormData.role === "LANDLORD") {
 
-            // Creates complex associated with registering landlord
-            const createdComplex = await complexAPI.createComplex(landlordComplexFormData)
+                // Creates complex associated with registering landlord
+                const createdComplex = await complexAPI.createComplex(landlordComplexFormData)
 
-            // Updates default complex_id value on registered landlord
-            registeredUser.complex_id = createdComplex.id
+                // Updates default complex_id value on registered landlord
+                registeredUser.complex_id = createdComplex.id
 
-            // Sends apartment complex form data to API for creation
-            const response = await userAPI.updateUser(registeredUser)
+                // Sends apartment complex form data to API for creation
+                const response = await userAPI.updateUser(registeredUser)
+                
+                // Updates landlord user -> apartment complex reference
+                updateUser(response.user)
+
+                // Console out process step
+                console.log("User successfully updated!")
+            }
+
+            const locallyStoredToken = localStorage.getItem("token")
             
-            // Updates landlord user -> apartment complex reference
-            updateUser(response.user)
+            // Error handling, that API generated token was stored locally
+            if (!locallyStoredToken) {
+                throw new Error("Token was not saved locally")
+            }
 
-            // Console out process step
-            console.log("User successfully updated!")
+            // Navigate authenticated user to home route
+            navigate("/")
+        } catch (error) {
+            console.error("Registration error:", error);
+            console.error("Error response:", error.response?.data);
+            alert(`Registration failed: ${error.response?.data?.error || error.message}`);
         }
-
-        const locallyStoredToken = localStorage.getItem("token")
-        
-        // Error handling, that API generated token was stored locally
-        if (!locallyStoredToken) {
-            throw new Error("Token was not saved locally")
-        }
-
-        // Navigate authenticated user to home route
-        navigate("/")
     }
 
     return (
@@ -170,8 +200,9 @@ export const RegistrationForm = () => {
                 )}
                 <br />
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password: </label>
+                <div className="flex flex-row">
                 <input
-                    type="text"
+                    type={showPassword ? "text" : "password"}
                     value={userFormData.password_hash}
                     id="password_hash"
                     name="password_hash"
@@ -179,6 +210,8 @@ export const RegistrationForm = () => {
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password ? 'border-red-500' : 'border-gray-300'
                         }`}
                 />
+                <button type="button" className="m-2" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff /> : <Eye />}</button>
+                </div>
                 {errors.password && (
                     <p className="text-red-500 text-sm mt-1">{errors.password}</p>
                 )}
@@ -226,13 +259,38 @@ export const RegistrationForm = () => {
                 {userFormData.role === "TENANT"
                     ?
                     <>
-                        <label htmlFor="building_name" className="block text-sm font-medium text-gray-700 mb-1">Building name: </label>
+                        <label htmlFor="complex_id" className="block text-sm font-medium text-gray-700 mb-1">Property/Complex: <span className="text-red-500">*</span></label>
+                        <select
+                            value={userFormData.complex_id}
+                            id="complex_id"
+                            name="complex_id"
+                            onChange={handleUserChange}
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.complex_id ? 'border-red-500' : 'border-gray-300'}`}
+                        >
+                            <option value="">Select a property...</option>
+                            {loadingComplexes ? (
+                                <option disabled>Loading properties...</option>
+                            ) : complexes.length === 0 ? (
+                                <option disabled>No properties available</option>
+                            ) : (
+                                complexes.map(complex => (
+                                    <option key={complex.id} value={complex.id}>
+                                        {complex.name} - {complex.address}
+                                    </option>
+                                ))
+                            )}
+                        </select>
+                        {errors.complex_id && (
+                            <p className="text-red-500 text-sm mt-1">{errors.complex_id}</p>
+                        )}
+                        <label htmlFor="building_name" className="block text-sm font-medium text-gray-700 mb-1 mt-4">Building name: <span className="text-gray-500 text-xs">(optional)</span></label>
                         <input
                             type="text"
                             value={userFormData.building_name}
                             id="building_name"
                             name="building_name"
                             onChange={handleUserChange}
+                            placeholder="e.g., Building A, North Tower (optional)"
                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.building_name ? 'border-red-500' : 'border-gray-300'
                                 }`}
                         />
@@ -256,13 +314,14 @@ export const RegistrationForm = () => {
                     :
                     <>
                     <h3 className="text-1x1 font-bold mb-8 text-gray-800">Optional fields</h3>
-                    <label htmlFor="building_name" className="block text-sm font-medium text-gray-700 mb-1">Building name: </label>
+                    <label htmlFor="building_name" className="block text-sm font-medium text-gray-700 mb-1">Building name: <span className="text-gray-500 text-xs">(optional)</span></label>
                         <input
                             type="text"
                             value={userFormData.building_name}
                             id="building_name"
                             name="building_name"
                             onChange={handleUserChange}
+                            placeholder="e.g., Building A, North Tower (optional)"
                             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         <label htmlFor="apartment_number" className="block text-sm font-medium text-gray-700 mb-1">Apartment number: </label>
@@ -321,4 +380,3 @@ export const RegistrationForm = () => {
         </div>
     )
 }
-

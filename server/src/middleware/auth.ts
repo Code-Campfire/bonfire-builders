@@ -4,11 +4,16 @@ import jwt from 'jsonwebtoken';
 
 export interface AuthRequest extends Request {
     user?: {
-        userId: number,
+        id: number,
         email: string,
         role: string,
-        firstName: string,
-        lastName: string
+        first_name: string,
+        last_name: string,
+        complex_id: number,
+        phone?: string,
+        apartment_number?: string,
+        building_name?: string,
+        move_in_date?: string
     };
 }
 

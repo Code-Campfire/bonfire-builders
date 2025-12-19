@@ -89,6 +89,17 @@ export const issueAPI = {
       throw error;
     }
   },
+
+  // Send a message for an issue
+  sendMessage: async (message) => {
+    try {
+      const response = await api.post('/messages', message);
+      return response.data;
+    } catch (error) {
+      console.error('Error sending message:', error);
+      throw error;
+    }
+  },
 };
 
 // User API calls
@@ -123,6 +134,15 @@ export const userAPI = {
 };
 
 export const complexAPI = {
+  getAllComplexes: async () => {
+    try {
+      const response = await api.get("/complexes");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching complexes:", error);
+      throw error;
+    }
+  },
   createComplex: async (apartmentComplexFormData) => {
     try {
       const response = await api.post("/complexes", apartmentComplexFormData);

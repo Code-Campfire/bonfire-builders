@@ -4,14 +4,17 @@ import { AuthRequest, authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 
-// GET all complexes
-router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
+// GET all complexes (public endpoint for registration)
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const complexes = await prisma.complex.findMany({
-      include: {
-        _count: {
-          select: { issues: true }
-        }
+      select: {
+        id: true,
+        name: true,
+        address: true
+      },
+      orderBy: {
+        name: 'asc'
       }
     });
     res.json(complexes);

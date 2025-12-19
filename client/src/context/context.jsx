@@ -20,23 +20,7 @@ export const AuthProvider = ({ children }) => {
             // decodes user data incorporated encoded at JWT generation
             const payload = JSON.parse(atob(token.split('.')[1]))
             setUser(payload)
-        } catch(error) {
-            return null
-        }
-    }
-
-    useEffect(() => {
-        const locallyStoredToken = localStorage.getItem("token")
-        decodeJwtForUser(locallyStoredToken)
-    }, [])
-
-    function decodeJwtForUser(token) {
-        try {
-            // Parses encoded, locally stored token
-            // from base64 to human-readable
-            // decodes user data incorporated encoded at JWT generation
-            const payload = JSON.parse(atob(token.split('.')[1]))
-            setUser(payload)
+            setToken(token)
         } catch(error) {
             return null
         }

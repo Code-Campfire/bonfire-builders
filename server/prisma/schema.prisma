@@ -17,7 +17,7 @@ model User {
   phone String
   complex_id Int // Reference includes address. User does not need it
   apartment_number String // More specific information per user
-  building_name String // More specific information per user
+  building_name String? // Optional - for complexes with multiple buildings
   move_in_date DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
