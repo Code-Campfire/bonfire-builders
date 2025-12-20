@@ -22,8 +22,9 @@ import {
   Edit,
   Trash2,
   X,
-} from 'lucide-react';
-import { Messages } from '../Components/messaging/Messages';
+  Pencil,
+} from "lucide-react";
+import { Messages } from "../Components/messaging/Messages";
 
 const IssueDetail = () => {
   const { id } = useParams();
@@ -31,6 +32,8 @@ const IssueDetail = () => {
   const [issue, setIssue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editingCaptionId, setEditingCaptionId] = useState(null);
+  const [editingCaptionText, setEditingCaptionText] = useState("");
 
   useEffect(() => {
     fetchIssueDetail();
@@ -89,6 +92,44 @@ const IssueDetail = () => {
       console.error("Failed to delete photo:", err);
       alert("Failed to delete photo. Please try again.");
     }
+  };
+
+  const handleEditCaption = (photo) => {
+    setEditingCaptionId(photo.id);
+    setEditingCaptionText(photo.caption);
+  };
+
+  const handleSaveCaption = async (photoId) => {
+    try {
+      const updatedPhoto = {
+        id: photoId,
+        caption: editingCaptionText,
+      };
+
+      await photoAPI.updatePhoto(updatedPhoto);
+
+      // Update local state
+      setIssue((prevIssue) => ({
+        ...prevIssue,
+        photos: prevIssue.photos.map((photo) =>
+          photo.id === photoId
+            ? { ...photo, caption: editingCaptionText }
+            : photo
+        ),
+      }));
+
+      // Exit edit mode
+      setEditingCaptionId(null);
+      setEditingCaptionText("");
+    } catch (err) {
+      console.error("Failed to update caption:", err);
+      alert("Failed to update caption. Please try again.");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCaptionId(null);
+    setEditingCaptionText("");
   };
 
   const handleCaptionChange = (e) => {
@@ -320,7 +361,9 @@ const IssueDetail = () => {
                 <div className="text-sm">
                   <div className="font-medium">{issue.complex.name}</div>
                   {issue.user?.building_name && (
-                    <div className="text-gray-700">Building: {issue.user.building_name}</div>
+                    <div className="text-gray-700">
+                      Building: {issue.user.building_name}
+                    </div>
                   )}
                   <div className="text-gray-600">{issue.complex.address}</div>
                 </div>
@@ -466,7 +509,7 @@ const IssueDetail = () => {
                       <img
                         src={photo.file_path}
                         alt={photo.caption || "Issue photo"}
-                        className="w-400 h-400 object-cover"
+                        className="w-full h-full object-cover"
                       />
                       <button
                         onClick={() => handleDeletePhoto(photo.id)}
@@ -477,10 +520,46 @@ const IssueDetail = () => {
                     </div>
                     <div>
                       {photo.caption ? (
-                        <div className="text-sm text-gray-700">
-                          {photo.caption}
-                        </div>
+                        editingCaptionId === photo.id ? (
+                          // Edit mode
+                          <div className="space-y-2">
+                            <textarea
+                              className="w-full text-sm p-2 border rounded"
+                              value={editingCaptionText}
+                              onChange={(e) =>
+                                setEditingCaptionText(e.target.value)
+                              }
+                              autoFocus
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleSaveCaption(photo.id)}
+                                className="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={handleCancelEdit}
+                                className="text-sm px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          // View mode
+                          <div className="text-sm text-gray-700 flex flex-row justify-between items-start p-2 rounded hover:bg-gray-50 group">
+                            <div className="flex-1">{photo.caption}</div>
+                            <button
+                              onClick={() => handleEditCaption(photo)}
+                              className="ml-2 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-200"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                          </div>
+                        )
                       ) : (
+                        // No caption yet - add caption mode
                         <div className="space-y-2">
                           <textarea
                             className="w-full text-sm p-2 border rounded"
@@ -536,12 +615,13 @@ const IssueDetail = () => {
             </h2>
           </CardHeader>
           <CardContent>
-           <Messages 
-           issue={issue} 
-           fetchIssueDetail={fetchIssueDetail} 
-           onMessageUpdate={(updatedMessages) => {
-            setIssue(prev => ({ ...prev, messages: updatedMessages}))
-           }} />
+            <Messages
+              issue={issue}
+              fetchIssueDetail={fetchIssueDetail}
+              onMessageUpdate={(updatedMessages) => {
+                setIssue((prev) => ({ ...prev, messages: updatedMessages }));
+              }}
+            />
           </CardContent>
         </Card>
       </div>
