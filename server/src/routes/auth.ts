@@ -1,35 +1,45 @@
 import express, { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 const router = express.Router();
 
 router.post('/login', async (req: Request, res: Response) => {
   // Does user exist in database?
   try {
     console.log(req.body.email)
-    const result = await prisma.user.findUnique({
+    // First, find the user by email only
+    const user = await prisma.user.findUnique({
       where: {
-        email: req.body.email,
-        password_hash: req.body.password_hash
-      },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        first_name: true,
-        last_name: true,
-        phone: true,
-        apartment_number: true,
-        building_name: true,
-        complex_id: true,
-        move_in_date: true,
+        email: req.body.email
       }
-    })
+    });
 
-    // Validates that a unique user was found
-    if(result === null) {
-      return res.status(403).json({ status: "Error", message: "User does not exist in the database" });
+    // Validates that a user was found
+    if(user === null) {
+      return res.status(403).json({ status: "Error", message: "Invalid email or password" });
     }
+
+    // Compare the provided password with the hashed password
+    const isPasswordValid = await bcrypt.compare(req.body.password_hash, user.password_hash);
+    
+    if (!isPasswordValid) {
+      return res.status(403).json({ status: "Error", message: "Invalid email or password" });
+    }
+
+    // Prepare user result without password
+    const result = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      phone: user.phone,
+      apartment_number: user.apartment_number,
+      building_name: user.building_name,
+      complex_id: user.complex_id,
+      move_in_date: user.move_in_date,
+    };
 
     // Yes, user exists in database
     // Creates user token
@@ -75,8 +85,16 @@ router.post('/login', async (req: Request, res: Response) => {
 router.post('/register', async (req: Request, res: Response) => {
   try {
     console.log(req.body)
+    
+    // Hash the password before storing
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(req.body.password_hash, saltRounds);
+    
     const result = await prisma.user.create({
-      data: req.body,
+      data: {
+        ...req.body,
+        password_hash: hashedPassword
+      },
       // Excludes the user password in the response.
       select: {
         id: true,

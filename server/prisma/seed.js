@@ -1,8 +1,14 @@
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcrypt");
 const prisma = new PrismaClient();
 
 async function main() {
   console.log("🌱 Starting database seed...");
+
+  // Hash passwords for test users
+  const saltRounds = 10;
+  const tenantPassword = await bcrypt.hash("password123", saltRounds);
+  const landlordPassword = await bcrypt.hash("password123", saltRounds);
 
   // Create a test complex
   const complex = await prisma.complex.upsert({
@@ -23,7 +29,7 @@ async function main() {
     update: {},
     create: {
       email: "tenant@example.com",
-      password_hash: "$2b$10$abcdefghijklmnopqrstuvwxyz123456", // Placeholder hash
+      password_hash: tenantPassword,
       role: "TENANT",
       first_name: "John",
       last_name: "Doe",
@@ -43,12 +49,15 @@ async function main() {
     update: {},
     create: {
       email: "landlord@example.com",
-      password_hash: "$2b$10$abcdefghijklmnopqrstuvwxyz123456", // Placeholder hash
+      password_hash: landlordPassword,
       role: "LANDLORD",
       first_name: "Jane",
       last_name: "Smith",
       phone: "555-0456",
+      apartment_number: "Office",
+      building_name: "Main Office",
       complex_id: complex.id,
+      move_in_date: new Date("2020-01-01"),
     },
   });
 

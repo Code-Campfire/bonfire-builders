@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
-import IssueCard from "../components/IssueCard";
-import IssueForm from "../Components/issueForm";
-import { issueAPI } from "../services/api";
-import { IssueFilters } from "../Components/IssueFilters";
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import IssueCard from '../components/IssueCard';
+import IssueForm from '../Components/issueForm';
+import { issueAPI } from '../services/api';
+import { IssueFilters } from '../Components/IssueFilters';
 
 const Issues = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [showForm, setShowForm] = useState(false);
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +20,15 @@ const Issues = () => {
     startDate: "",
     endDate: "",
   });
+
+  // Check if URL indicates we should show the form
+  useEffect(() => {
+    if (location.pathname === '/issues/new') {
+      setShowForm(true);
+    } else if (location.pathname === '/issues') {
+      setShowForm(false);
+    }
+  }, [location.pathname]);
 
   // Fetch issues when component mounts
   useEffect(() => {
@@ -48,7 +60,8 @@ const Issues = () => {
       // Add the new issue to the list
       setIssues([createdIssue, ...issues]);
       setShowForm(false);
-
+      navigate('/issues');
+      
       // Show success message (you could use a toast notification library)
       alert("Issue submitted successfully!");
     } catch (err) {
@@ -98,17 +111,26 @@ const Issues = () => {
     return true;
   });
 
+  const handleToggleForm = () => {
+    if (showForm) {
+      setShowForm(false);
+      navigate('/issues');
+    } else {
+      setShowForm(true);
+      navigate('/issues/new');
+    }
+  };
+
+  const handleCancelForm = () => {
+    setShowForm(false);
+    setError(null);
+    navigate('/issues');
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Maintenance Issues</h1>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          disabled={loading}
-          className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-red-900 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors"
-        >
-          {showForm ? "View Issues" : "Report New Issue"}
-        </button>
       </div>
 
       {/* Error Message */}
@@ -142,10 +164,7 @@ const Issues = () => {
       {showForm ? (
         <IssueForm
           onSubmit={handleSubmitIssue}
-          onCancel={() => {
-            setShowForm(false);
-            setError(null);
-          }}
+          onCancel={handleCancelForm}
           isSubmitting={submitting}
         />
       ) : loading ? (

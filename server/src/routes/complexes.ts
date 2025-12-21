@@ -1,6 +1,6 @@
 import express, { Response } from 'express';
 import prisma from '../lib/prisma';
-import { AuthRequest, authenticateToken } from '../middleware/auth';
+import { AuthRequest, authenticateToken, requireLandlord } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -43,8 +43,8 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
   }
 });
 
-// POST a new complex
-router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
+// POST a new complex (landlord only)
+router.post('/', authenticateToken, requireLandlord, async (req: AuthRequest, res: Response) => {
   try {
     const complex = await prisma.complex.create({
       data: req.body
@@ -58,8 +58,8 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   }
 });
 
-// PUT a complex
-router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+// PUT a complex (landlord only)
+router.put('/:id', authenticateToken, requireLandlord, async (req: AuthRequest, res: Response) => {
   try {
     const complex = await prisma.complex.update({
       where: {
@@ -76,8 +76,8 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
   }
 });
 
-// DELETE a complex
-router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+// DELETE a complex (landlord only)
+router.delete('/:id', authenticateToken, requireLandlord, async (req: AuthRequest, res: Response) => {
   try {
     await prisma.complex.delete({
       where: {

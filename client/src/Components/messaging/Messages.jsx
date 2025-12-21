@@ -22,9 +22,9 @@ export const Messages = ({ issue, onMessageUpdate }) => {
       socket.on('new-message', (message) => {
         if (message.issue_id === issue.id) {
           setMessages(prev => {
-          const updated = [...prev, message]
-          onMessageUpdate(updated)
-          return updated;
+            const updated = [...prev, message];
+            onMessageUpdate(updated);
+            return updated;
           });
         }
       });

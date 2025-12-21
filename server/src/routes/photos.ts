@@ -13,8 +13,8 @@ interface File {
 
 const router = express.Router();
 
-// GET all photos
-router.get('/', async (req: Request, res: Response) => {
+// GET all photos (requires authentication)
+router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const photos = await prisma.photo.findMany();
     res.json(photos);
@@ -27,7 +27,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // Get presigned URLs (temporary URL that allows the client to upload to S3 directly)
-router.post('/presigned-urls', async (req: Request, res: Response) => {
+router.post('/presigned-urls', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { files }: { files: File[] } = req.body;
     const presignedUrls = await Promise.all(
@@ -64,8 +64,8 @@ router.post('/presigned-urls', async (req: Request, res: Response) => {
 // GET all photos for a specific issue
 
 
-// POST a new photo
-router.post('/', async (req: Request, res: Response) => {
+// POST a new photo (requires authentication)
+router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { photos, issueId } = req.body;
 
@@ -106,8 +106,8 @@ router.post('/', async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 });
-// PUT a photo
-router.put("/:photoId", async (req: AuthRequest, res: Response) => {
+// PUT a photo (requires authentication)
+router.put("/:photoId", authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const uniquePhoto = await prisma.photo.findUnique({
       where: {
@@ -151,8 +151,8 @@ router.put("/:photoId", async (req: AuthRequest, res: Response) => {
   }
 })
 
-// DELETE a photo
-router.delete('/:id', async (req: Request, res: Response) => {
+// DELETE a photo (requires authentication)
+router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const photoId = parseInt(req.params.id);
 

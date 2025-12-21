@@ -175,7 +175,17 @@ export const photoAPI = {
       throw error;
     }
   },
-    updatePhoto: async (photo) => {
+  // Save photo metadata after upload
+  savePhotoMetadata: async (photos, issueId) => {
+    try {
+      const response = await api.post("/photos", { photos, issueId });
+      return response.data;
+    } catch (error) {
+      console.error("Error saving photo metadata:", error);
+      throw error;
+    }
+  },
+  updatePhoto: async (photo) => {
     try{
       const response = await api.put(`/photos/${photo.id}`, photo)
       return response.data
