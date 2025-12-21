@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { photoAPI } from '../services/api';
+import { useState } from "react";
+import { photoAPI } from "../services/api";
 
 export const PhotoUpload = ({ issueId, onUploadComplete }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -13,13 +13,14 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
     const fileArray = Array.from(files);
 
     // Validate files
-    const validFiles = fileArray.filter(file => {
-      if (!file.type.startsWith('image/')) {
-        setUploadError('Only image files are allowed');
+    const validFiles = fileArray.filter((file) => {
+      if (!file.type.startsWith("image/")) {
+        setUploadError("Only image files are allowed");
         return false;
       }
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        setUploadError('Files must be less than 5MB');
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
+        setUploadError("Files must be less than 5MB");
         return false;
       }
       return true;
@@ -37,9 +38,9 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
 
     try {
       // Get presigned URLs
-      const fileMetadata = selectedFiles.map(file => ({
+      const fileMetadata = selectedFiles.map((file) => ({
         name: file.name,
-        type: file.type
+        type: file.type,
       }));
 
       const { presignedUrls } = await photoAPI.getPresignedUrls(fileMetadata);
@@ -50,9 +51,9 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
           const { uploadUrl } = presignedUrls[index];
 
           const uploadResponse = await fetch(uploadUrl, {
-            method: 'PUT',
+            method: "PUT",
             body: file,
-            headers: { 'Content-Type': file.type }
+            headers: { "Content-Type": file.type },
           });
 
           if (!uploadResponse.ok) {
@@ -67,30 +68,32 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
         fileName: file.name,
         fileSize: file.size,
         mimeType: file.type,
-        caption: ''
+        caption: "",
       }));
 
-      const saveResponse = await fetch(`${import.meta.env.VITE_API_URL}/photos`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          photos: photoMetadata,
-          issueId: issueId
-        })
-      });
+      const saveResponse = await fetch(
+        `${import.meta.env.VITE_API_URL}/photos`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            photos: photoMetadata,
+            issueId: issueId,
+          }),
+        }
+      );
 
       if (!saveResponse.ok) {
-        throw new Error('Failed to save photo metadata');
+        throw new Error("Failed to save photo metadata");
       }
 
       // Clear selection and refresh
       setSelectedFiles([]);
       const savedPhotos = await saveResponse.json();
       onUploadComplete(savedPhotos);
-
     } catch (err) {
-      console.error('Upload failed:', err);
-      setUploadError(err.message || 'Upload failed. Please try again.');
+      console.error("Upload failed:", err);
+      setUploadError(err.message || "Upload failed. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -104,7 +107,7 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
         multiple
         accept="image/*"
         onChange={handleFileSelect}
-        className="hidden"
+        style={{ display: "none" }}
         id="photo-upload"
         disabled={uploading}
       />
@@ -147,7 +150,11 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
             disabled={uploading}
             className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400"
           >
-            {uploading ? 'Uploading...' : `Upload ${selectedFiles.length} Photo${selectedFiles.length > 1 ? 's' : ''}`}
+            {uploading
+              ? "Uploading..."
+              : `Upload ${selectedFiles.length} Photo${
+                  selectedFiles.length > 1 ? "s" : ""
+                }`}
           </button>
         )}
       </div>
