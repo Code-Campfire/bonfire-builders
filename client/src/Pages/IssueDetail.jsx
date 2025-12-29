@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { StatusBadge } from "../components/StatusBadge";
@@ -44,6 +44,7 @@ const IssueDetail = () => {
       setLoading(true);
       setError(null);
       const data = await issueAPI.getIssueById(id);
+      console.log('Fetched issue data:', data);
       setIssue(data);
     } catch (err) {
       console.error("Failed to fetch issue:", err);
@@ -52,6 +53,10 @@ const IssueDetail = () => {
       setLoading(false);
     }
   };
+
+  const handleMessageUpdate = useCallback((updatedMessages) => {
+    setIssue(prev => ({ ...prev, messages: updatedMessages}))
+  }, []);
 
   const handleBack = () => {
     navigate("/issues");
@@ -615,13 +620,10 @@ const IssueDetail = () => {
             </h2>
           </CardHeader>
           <CardContent>
-            <Messages
-              issue={issue}
-              fetchIssueDetail={fetchIssueDetail}
-              onMessageUpdate={(updatedMessages) => {
-                setIssue((prev) => ({ ...prev, messages: updatedMessages }));
-              }}
-            />
+            <Messages 
+              issue={issue} 
+              fetchIssueDetail={fetchIssueDetail} 
+              onMessageUpdate={handleMessageUpdate} />
           </CardContent>
         </Card>
       </div>

@@ -38,27 +38,12 @@ function App() {
           <Layout />
         </ProtectedRoute>
       }>
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        } />
-        <Route path="/issues" element={
-          <ProtectedRoute>
-            <Issues />
-          </ProtectedRoute>
-        } />
+        <Route path="/" element={<Home />} />
+        <Route path="/issues" element={<Issues />} />
+        <Route path="/issues/new" element={<Issues />} />
+        <Route path="/issues/:id/edit" element={<EditIssue />} />
+        <Route path="/issues/:id" element={<IssueDetail />} />
       </Route>
-      <Route path="/issues/:id" element={
-        <ProtectedRoute>
-          <IssueDetail />
-        </ProtectedRoute>
-      } />
-      <Route path="/issues/:id/edit" element={
-        <ProtectedRoute>
-          <EditIssue />
-        </ProtectedRoute>
-      } />
     </Routes>
   );
 }

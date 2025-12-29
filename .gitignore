@@ -39,4 +39,7 @@ Thumbs.db
 .roomodes
 *.py
 *.sh
-plans/
+
+# Security files
+SECURITY_ALERT.md
+plans/SECURITY_ALERT.md

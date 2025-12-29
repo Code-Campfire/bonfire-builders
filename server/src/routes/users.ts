@@ -1,10 +1,11 @@
 import express, { Request, Response } from 'express';
 import prisma from '../lib/prisma';
-import { AuthRequest, authenticateToken } from '../middleware/auth';
+import { AuthRequest, authenticateToken, requireLandlord } from '../middleware/auth';
 
 const router = express.Router();
 
-router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
+// GET all users (landlord only)
+router.get('/', authenticateToken, requireLandlord, async (req: AuthRequest, res: Response) => {
   try {
     // Fetch all users from the database
     const users = await prisma.user.findMany();
@@ -18,9 +19,19 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   }
 });
 
-// GET a specific user
+// GET a specific user (own data or landlord)
 router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
+    const requestedUserId = Number(req.params.id);
+    const currentUserId = req.user?.id;
+
+    // Users can only access their own data, landlords can access any
+    if (req.user?.role !== 'LANDLORD' && requestedUserId !== currentUserId) {
+      return res.status(403).json({
+        message: "You do not have permission to access this user's data",
+        error: "Forbidden"
+      });
+    }
     const uniqueUser = await prisma.user.findUnique({
       where: {
         id: Number(req.params.id)
@@ -111,9 +122,19 @@ router.get('/in-apartment/:apartmentId', authenticateToken, async (req: AuthRequ
   }
 })
 
-// PUT a user
+// PUT a user (own data or landlord)
 router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
+    const requestedUserId = Number(req.params.id);
+    const currentUserId = req.user?.id;
+
+    // Users can only update their own data, landlords can update any
+    if (req.user?.role !== 'LANDLORD' && requestedUserId !== currentUserId) {
+      return res.status(403).json({
+        message: "You do not have permission to update this user",
+        error: "Forbidden"
+      });
+    }
     // Verifies that user first exists before update
     const uniqueUser = await prisma.user.findUnique({
       where: {
@@ -163,8 +184,8 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
   }
 })
 
-// DELETE a user
-router.delete("/:id", authenticateToken, async (req: AuthRequest, res: Response) => {
+// DELETE a user (landlord only)
+router.delete("/:id", authenticateToken, requireLandlord, async (req: AuthRequest, res: Response) => {
   try {
      // Verifies that user first exists before update
     const uniqueUser = await prisma.user.findUnique({

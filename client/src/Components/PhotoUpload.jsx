@@ -71,25 +71,10 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
         caption: "",
       }));
 
-      const saveResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/photos`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            photos: photoMetadata,
-            issueId: issueId,
-          }),
-        }
-      );
-
-      if (!saveResponse.ok) {
-        throw new Error("Failed to save photo metadata");
-      }
+      const savedPhotos = await photoAPI.savePhotoMetadata(photoMetadata, issueId);
 
       // Clear selection and refresh
       setSelectedFiles([]);
-      const savedPhotos = await saveResponse.json();
       onUploadComplete(savedPhotos);
     } catch (err) {
       console.error("Upload failed:", err);
