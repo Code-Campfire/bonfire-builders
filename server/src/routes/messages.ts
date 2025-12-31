@@ -1,6 +1,8 @@
 import express, { Response } from 'express';
 import prisma from '../lib/prisma';
 import { AuthRequest, authenticateToken } from '../middleware/auth';
+import { sendNewMessageNotification } from '../services/emailService';
+import { join } from 'path';
 
 const router = express.Router();
 
@@ -45,6 +47,11 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
         }
       }
     });
+
+    // Send email notification to tenant if landlord sent the message
+    if (req.user && req.user.role === 'LANDLORD') {
+      await sendNewMessageNotification(issue.user, issue, message_text, req.user);
+    }
 
     // Emit real-time event
     const io = req.app.get('io');
