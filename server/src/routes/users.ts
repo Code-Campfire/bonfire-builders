@@ -47,6 +47,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
         building_name: true,
         complex_id: true,
         move_in_date: true,
+        preferences: true,
       }
     })
 
@@ -73,6 +74,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
         building_name: uniqueUser?.building_name,
         complex_id: uniqueUser?.complex_id,
         move_in_date: uniqueUser?.move_in_date,
+        preferences: uniqueUser?.preferences,
       }
     })
   }
@@ -101,6 +103,7 @@ router.get('/in-apartment/:apartmentId', authenticateToken, async (req: AuthRequ
         building_name: true,
         complex_id: true,
         move_in_date: true,
+        preferences: true,
       }
     })
 
@@ -168,6 +171,7 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
         building_name: true,
         complex_id: true,
         move_in_date: true,
+        preferences: true,
       }
     })
         
