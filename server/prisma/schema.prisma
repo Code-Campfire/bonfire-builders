@@ -19,6 +19,7 @@ model User {
   apartment_number String // More specific information per user
   building_name String? // Optional - for complexes with multiple buildings
   move_in_date DateTime
+  preferences Json @default("{\"emailNotifications\": true}")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
