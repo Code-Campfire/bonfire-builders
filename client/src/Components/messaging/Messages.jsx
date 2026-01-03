@@ -64,7 +64,7 @@ export const Messages = ({ issue, onMessageUpdate }) => {
   };
 
   return (
-    <div className="messages-container">
+    <div className="messages-container" id="messages-list">
       {messages && messages.length > 0 ? (
         <div className="space-y-4">
           {messages.map((message) => (
@@ -99,7 +99,7 @@ export const Messages = ({ issue, onMessageUpdate }) => {
         </div>
       )}
 
-      <div className="mt-4">
+      <div className="mt-4" id="message-form">
         <textarea
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}

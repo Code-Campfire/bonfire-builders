@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { StatusBadge } from "../components/StatusBadge";
 import { PriorityBadge } from "../components/PriorityBadge";
@@ -29,6 +29,7 @@ import { Messages } from "../Components/messaging/Messages";
 const IssueDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [issue, setIssue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,6 +39,20 @@ const IssueDetail = () => {
   useEffect(() => {
     fetchIssueDetail();
   }, [id]);
+
+  // Scroll to section when hash changes
+  useEffect(() => {
+    if (!loading && location.hash === '#messages') {
+      // Small delay to ensure DOM is fully rendered
+      setTimeout(() => {
+        const messagesList = document.getElementById('messages-list');
+        if (messagesList) {
+          // Scroll to the end of the entire messages component
+          messagesList.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+      }, 100);
+    }
+  }, [loading, location.hash]);
 
   const fetchIssueDetail = async () => {
     try {
@@ -612,7 +627,7 @@ const IssueDetail = () => {
         </Card>
 
         {/* Messages Section */}
-        <Card>
+        <Card id="messages-section">
           <CardHeader>
             <h2 className="text-xl font-bold flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />

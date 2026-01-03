@@ -1,6 +1,7 @@
 import express, { Response } from 'express';
 import prisma from '../lib/prisma';
 import { AuthRequest, authenticateToken } from '../middleware/auth';
+import { sendNewMessageNotification } from '../services/emailService';
 
 const router = express.Router();
 
@@ -45,6 +46,29 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
         }
       }
     });
+
+    // Send notifications to tenant if landlord sent message
+    if (req.user && req.user.role === 'LANDLORD') {
+      const userPreferences = (issue.user.preferences as { emailNotifications?: boolean }) || {};
+      const emailEnabled = userPreferences.emailNotifications !== false; // Default true
+
+      // Send email notification if enabled
+      if (emailEnabled) {
+        await sendNewMessageNotification(issue.user, issue, message_text, req.user);
+      }
+
+      // Always create in-app notification
+      await prisma.notification.create({
+        data: {
+          user_id: issue.user_id,
+          type: 'MESSAGE_RECEIVED',
+          title: 'New message on your issue',
+          message: `${req.user.first_name} ${req.user.last_name} replied to "${issue.title}"`,
+          issue_id: issue.id,
+          message_id: message.id
+        }
+      });
+    }
 
     // Emit real-time event
     const io = req.app.get('io');

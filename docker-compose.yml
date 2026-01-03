@@ -29,6 +29,7 @@ services:
       context: ./server
       dockerfile: Dockerfile
     container_name: apartment-tracker-server
+    command: sh -c "npx prisma migrate deploy && npm run dev"
     ports:
       - "5002:5000"
     volumes:

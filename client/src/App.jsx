@@ -2,6 +2,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import Issues from './Pages/Issues';
 import IssueDetail from './Pages/IssueDetail';
 import EditIssue from './Pages/EditIssue';
+import Settings from './Pages/Settings';
 import { useAuth } from './context/context';
 import { LoginForm } from './Components/authentication/LoginForm'
 import { RegistrationForm } from './Components/authentication/RegistrationForm'
@@ -43,6 +44,7 @@ function App() {
         <Route path="/issues/new" element={<Issues />} />
         <Route path="/issues/:id/edit" element={<EditIssue />} />
         <Route path="/issues/:id" element={<IssueDetail />} />
+        <Route path="/settings" element={<Settings />} />
       </Route>
     </Routes>
   );
