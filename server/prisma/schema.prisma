@@ -26,7 +26,8 @@ model User {
   complex   Complex  @relation(fields: [complex_id], references: [id])
   issues    Issue[]
   messages  Message[]
-  @@map("users")  
+  notifications Notification[]
+  @@map("users")
 }
 
 model Complex {
@@ -62,6 +63,7 @@ model Issue {
   complex     Complex  @relation(fields: [complex_id], references: [id])
   photos      Photo[]
   messages    Message[]
+  notifications Notification[]
 
   @@map("issues")
   @@index([user_id])
@@ -98,8 +100,31 @@ model Message {
 
   issue     Issue    @relation(fields: [issue_id], references: [id])
   sender    User     @relation(fields: [sender_id], references: [id])
+  notifications Notification[]
 
   @@map("messages")
+}
+
+model Notification {
+  id              Int              @id @default(autoincrement())
+  user_id         Int
+  type            NotificationType
+  title           String
+  message         String
+  issue_id        Int?
+  message_id      Int?
+  is_read         Boolean          @default(false)
+  read_at         DateTime?
+  createdAt       DateTime         @default(now())
+
+  user            User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  issue           Issue?           @relation(fields: [issue_id], references: [id], onDelete: Cascade)
+  relatedMessage  Message?         @relation(fields: [message_id], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+  @@index([user_id])
+  @@index([user_id, is_read])
+  @@index([createdAt])
 }
 
 // Enums
@@ -137,4 +162,15 @@ enum Status {
   IN_PROGRESS
   RESOLVED
   CLOSED
+}
+
+enum NotificationType {
+  ISSUE_CREATED
+  ISSUE_STATUS_CHANGED
+  ISSUE_ACKNOWLEDGED
+  ISSUE_RESOLVED
+  ISSUE_CLOSED
+  MESSAGE_RECEIVED
+  ISSUE_PRIORITY_CHANGED
+  SYSTEM_ANNOUNCEMENT
 }
