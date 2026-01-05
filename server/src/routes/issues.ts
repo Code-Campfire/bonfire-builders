@@ -172,7 +172,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 });
 
 // PUT/UPDATE an issue (requires authentication and ownership or landlord role)
-router.put('/:id', authenticateToken, authenticateToken, async (req: AuthRequest, res: Response) => {
+router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { title, description, category, priority, status, location } = req.body;
     const issueId = Number(req.params.id);
