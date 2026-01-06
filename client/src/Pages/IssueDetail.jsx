@@ -25,6 +25,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { Messages } from "../Components/messaging/Messages";
+import { PhotoCarousel } from "../Components/PhotoCarousel";
 
 const IssueDetail = () => {
   const { id } = useParams();
@@ -34,6 +35,8 @@ const IssueDetail = () => {
   const [error, setError] = useState(null);
   const [editingCaptionId, setEditingCaptionId] = useState(null);
   const [editingCaptionText, setEditingCaptionText] = useState("");
+  const [carouselOpen, setCarouselOpen] = useState(false);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
 
   useEffect(() => {
     fetchIssueDetail();
@@ -44,7 +47,7 @@ const IssueDetail = () => {
       setLoading(true);
       setError(null);
       const data = await issueAPI.getIssueById(id);
-      console.log('Fetched issue data:', data);
+      console.log("Fetched issue data:", data);
       setIssue(data);
     } catch (err) {
       console.error("Failed to fetch issue:", err);
@@ -55,7 +58,7 @@ const IssueDetail = () => {
   };
 
   const handleMessageUpdate = useCallback((updatedMessages) => {
-    setIssue(prev => ({ ...prev, messages: updatedMessages}))
+    setIssue((prev) => ({ ...prev, messages: updatedMessages }));
   }, []);
 
   const handleBack = () => {
@@ -135,6 +138,15 @@ const IssueDetail = () => {
   const handleCancelEdit = () => {
     setEditingCaptionId(null);
     setEditingCaptionText("");
+  };
+
+  const handlePhotoClick = (photoIndex) => {
+    setSelectedPhotoIndex(photoIndex);
+    setCarouselOpen(true);
+  };
+
+  const handleCloseCarousel = () => {
+    setCarouselOpen(false);
   };
 
   const handleCaptionChange = (e) => {
@@ -252,7 +264,7 @@ const IssueDetail = () => {
             className="flex items-center gap-2 text-blue-700 hover:text-rose-900 mb-4 transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
-            Back to Maintenance Requests 
+            Back to Maintenance Requests
           </button>
 
           {/* Action Buttons */}
@@ -508,13 +520,14 @@ const IssueDetail = () => {
           <CardContent>
             {issue.photos && issue.photos.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {issue.photos.map((photo) => (
+                {issue.photos.map((photo, index) => (
                   <div key={photo.id} className="space-y-2">
                     <div className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
                       <img
                         src={photo.file_path}
                         alt={photo.caption || "Issue photo"}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover cursor-pointer"
+                        onClick={() => handlePhotoClick(index)}
                       />
                       <button
                         onClick={() => handleDeletePhoto(photo.id)}
@@ -529,6 +542,7 @@ const IssueDetail = () => {
                           // Edit mode
                           <div className="space-y-2">
                             <textarea
+                              maxLength={500}
                               className="w-full text-sm p-2 border rounded"
                               value={editingCaptionText}
                               onChange={(e) =>
@@ -553,11 +567,11 @@ const IssueDetail = () => {
                           </div>
                         ) : (
                           // View mode
-                          <div className="text-sm text-gray-700 flex flex-row justify-between items-start p-2 rounded hover:bg-gray-50 group">
-                            <div className="flex-1">{photo.caption}</div>
+                          <div className="relative text-sm text-gray-700 p-2 rounded hover:bg-gray-50 group">
+                            <div className="pr-8">{photo.caption}</div>
                             <button
                               onClick={() => handleEditCaption(photo)}
-                              className="ml-2 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-200"
+                              className="absolute top-1 right-1 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-200"
                             >
                               <Pencil className="h-4 w-4" />
                             </button>
@@ -620,13 +634,21 @@ const IssueDetail = () => {
             </h2>
           </CardHeader>
           <CardContent>
-            <Messages 
-              issue={issue} 
-              fetchIssueDetail={fetchIssueDetail} 
-              onMessageUpdate={handleMessageUpdate} />
+            <Messages
+              issue={issue}
+              fetchIssueDetail={fetchIssueDetail}
+              onMessageUpdate={handleMessageUpdate}
+            />
           </CardContent>
         </Card>
       </div>
+
+      <PhotoCarousel
+        photos={issue.photos}
+        initialIndex={selectedPhotoIndex}
+        isOpen={carouselOpen}
+        onClose={handleCloseCarousel}
+      />
     </div>
   );
 };
