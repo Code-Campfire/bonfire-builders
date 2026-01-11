@@ -7,6 +7,7 @@ import { PhotoUpload } from "../Components/PhotoUpload";
 import { formatCategory } from "@/utils/categoryUtils";
 import { getDaysAgo } from "@/utils/dateUtils";
 import { issueAPI, photoAPI } from "../services/api";
+import { toast } from "sonner";
 import {
   Calendar,
   Camera,
@@ -25,8 +26,8 @@ import {
   Pencil,
 } from "lucide-react";
 import { Messages } from "../Components/messaging/Messages";
+import { useAuth } from "../context/context";
 import { PhotoCarousel } from "../Components/PhotoCarousel";
-import { useAuth } from '../context/context';
 
 const IssueDetail = () => {
   const { id } = useParams();
@@ -38,10 +39,10 @@ const IssueDetail = () => {
   const [error, setError] = useState(null);
   const [editingCaptionId, setEditingCaptionId] = useState(null);
   const [editingCaptionText, setEditingCaptionText] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [updatingStatus, setUpdatingStatus] = useState(false);
   const [carouselOpen, setCarouselOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     fetchIssueDetail();
@@ -63,8 +64,10 @@ const IssueDetail = () => {
 
   useEffect(() => {
     if (issue) {
-      const allowedStatuses = ['IN_PROGRESS', 'RESOLVED', 'CLOSED'];
-      setSelectedStatus(allowedStatuses.includes(issue.status) ? issue.status : '');
+      const allowedStatuses = ["IN_PROGRESS", "RESOLVED", "CLOSED"];
+      setSelectedStatus(
+        allowedStatuses.includes(issue.status) ? issue.status : ""
+      );
     }
   }, [issue]);
 
@@ -106,7 +109,7 @@ const IssueDetail = () => {
         navigate("/issues");
       } catch (err) {
         console.error("Failed to delete issue:", err);
-        alert("Failed to delete issue. Please try again.");
+        toast.error("Failed to delete issue. Please try again.");
       }
     }
   };
@@ -124,7 +127,7 @@ const IssueDetail = () => {
       }));
     } catch (err) {
       console.error("Failed to delete photo:", err);
-      alert("Failed to delete photo. Please try again.");
+      toast.error("Failed to delete photo. Please try again.");
     }
   };
 
@@ -157,7 +160,7 @@ const IssueDetail = () => {
       setEditingCaptionText("");
     } catch (err) {
       console.error("Failed to update caption:", err);
-      alert("Failed to update caption. Please try again.");
+      toast.error("Failed to update caption. Please try again.");
     }
   };
 
@@ -229,12 +232,14 @@ const IssueDetail = () => {
 
     try {
       setUpdatingStatus(true);
-      await issueAPI.updateIssue(id, { status: selectedStatus });
-      await fetchIssueDetail();
-      alert('Status updated successfully');
+      const updatedIssue = await issueAPI.updateIssue(id, {
+        status: selectedStatus,
+      });
+      setIssue((prev) => ({ ...prev, ...updatedIssue }));
+      toast.success("Issue status updated successfully");
     } catch (err) {
-      console.error('Failed to update status:', err);
-      alert('Failed to update status. Please try again.');
+      console.error("Failed to update status:", err);
+      toast.error("Failed to update status. Please try again.");
     } finally {
       setUpdatingStatus(false);
     }
@@ -432,7 +437,7 @@ const IssueDetail = () => {
         </Card>
 
         {/* Status Update Card */}
-        {user?.role === 'LANDLORD' && (
+        {user?.role === "LANDLORD" && (
           <Card className="mb-6">
             <CardHeader>
               <h2 className="text-xl font-bold">Update Status</h2>
@@ -451,10 +456,14 @@ const IssueDetail = () => {
                 </select>
                 <button
                   onClick={handleStatusUpdate}
-                  disabled={updatingStatus || !selectedStatus || selectedStatus === issue?.status}
+                  disabled={
+                    updatingStatus ||
+                    !selectedStatus ||
+                    selectedStatus === issue?.status
+                  }
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {updatingStatus ? 'Updating...' : 'Update Status'}
+                  {updatingStatus ? "Updating..." : "Update Status"}
                 </button>
               </div>
             </CardContent>
