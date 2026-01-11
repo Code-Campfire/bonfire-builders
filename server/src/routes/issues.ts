@@ -224,13 +224,31 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
       ...(location && { location: location.trim() })
     };
 
-    // Set date fields based on status
-    if (status === 'IN_PROGRESS' && !currentIssue.acknowledged_date) {
-      updateData.acknowledged_date = new Date();
-    } else if (status === 'RESOLVED' && !currentIssue.resolved_date) {
-      updateData.resolved_date = new Date();
-    } else if (status === 'CLOSED' && !currentIssue.closed_date) {
-      updateData.closed_date = new Date();
+    // Set date fields based on status transitions
+    // When moving to a status, set its date if not already set
+    // When moving back to an earlier status, clear the dates for later statuses
+    if (status === 'PENDING') {
+      // Moving back to PENDING clears all progress dates
+      updateData.acknowledged_date = null;
+      updateData.resolved_date = null;
+      updateData.closed_date = null;
+    } else if (status === 'IN_PROGRESS') {
+      if (!currentIssue.acknowledged_date) {
+        updateData.acknowledged_date = new Date();
+      }
+      // Clear resolved and closed dates (moving back from later status)
+      updateData.resolved_date = null;
+      updateData.closed_date = null;
+    } else if (status === 'RESOLVED') {
+      if (!currentIssue.resolved_date) {
+        updateData.resolved_date = new Date();
+      }
+      // Clear closed_date (moving back from CLOSED)
+      updateData.closed_date = null;
+    } else if (status === 'CLOSED') {
+      if (!currentIssue.closed_date) {
+        updateData.closed_date = new Date();
+      }
     }
 
     const updatedIssue = await prisma.issue.update({
