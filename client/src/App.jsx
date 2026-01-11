@@ -1,4 +1,5 @@
 import { Routes, Route, Link } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import Issues from './Pages/Issues';
 import IssueDetail from './Pages/IssueDetail';
 import EditIssue from './Pages/EditIssue';
@@ -29,6 +30,8 @@ function App() {
   const { token } = useAuth()
 
   return (
+    <>
+    <Toaster richColors position="bottom-right" />
     <Routes>
       <Route path="/login" element={<LoginForm />} />
       <Route path="/register" element={<RegistrationForm />} />
@@ -45,6 +48,7 @@ function App() {
         <Route path="/issues/:id" element={<IssueDetail />} />
       </Route>
     </Routes>
+    </>
   );
 }
 
