@@ -206,12 +206,12 @@ export const RegistrationForm = () => {
                     id="password_hash"
                     name="password_hash"
                     onChange={handleUserChange}
-                    className={getInputClasses(!!errors.password)}
+                    className={getInputClasses(!!errors.password_hash)}
                 />
                 <button type="button" className="m-2" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff /> : <Eye />}</button>
                 </div>
-                {errors.password && (
-                    <p className={errorText}>{errors.password}</p>
+                {errors.password_hash && (
+                    <p className={errorText}>{errors.password_hash}</p>
                 )}
                 <label htmlFor="first_name" className={labelBase}>First name: </label>
                 <input
