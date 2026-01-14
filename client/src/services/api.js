@@ -104,6 +104,15 @@ export const issueAPI = {
 
 // User API calls
 export const userAPI = {
+  getUser: async (userId) => {
+    try {
+      const response = await api.get(`/users/${userId}`);
+      return response.data.user;
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      throw error;
+    }
+  },
   loginUser: async (userCredentials) => {
     try {
       const response = await api.post(`/auth/login`, userCredentials);

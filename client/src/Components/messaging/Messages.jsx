@@ -3,6 +3,7 @@ import { useSocket } from '../../context/SocketContext';
 import { issueAPI } from '../../services/api';
 import { MessageSquare, User } from "lucide-react"
 import { useAuth } from '../../context/context';
+import { getButtonClasses, textareaBase, typography } from '../../styles';
 
 export const Messages = ({ issue, onMessageUpdate }) => {
   const [messages, setMessages] = useState(issue.messages || []);
@@ -70,31 +71,31 @@ export const Messages = ({ issue, onMessageUpdate }) => {
           {messages.map((message) => (
             <div
               key={message.id}
-              className="p-4 bg-gray-50 rounded-lg border border-gray-200"
+              className="p-4 bg-muted rounded-lg border border-border"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-500" />
+                  <User className="h-4 w-4 text-muted-foreground" />
                   <span className="font-medium">
                     {message.sender?.first_name} {message.sender?.last_name}
                   </span>
-                  <span className="px-2 py-0.5 bg-gray-200 rounded text-xs">
+                  <span className="px-2 py-0.5 bg-secondary rounded text-xs">
                     {message.sender?.role}
                   </span>
                 </div>
-                <span className="text-sm text-gray-500">
+                <span className={typography.smallMuted}>
                   {new Date(message.sent_at).toLocaleString()}
                 </span>
               </div>
-              <p className="text-gray-700 whitespace-pre-wrap">
+              <p className="text-foreground whitespace-pre-wrap">
                 {message.message_text}
               </p>
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-8 text-black-500">
-          <MessageSquare className="h-12 w-12 mx-auto mb-2 text-black-400" />
+        <div className="text-center py-8 text-muted-foreground">
+          <MessageSquare className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
           <p>No messages yet</p>
         </div>
       )}
@@ -105,14 +106,14 @@ export const Messages = ({ issue, onMessageUpdate }) => {
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="Type your message..."
-          className="w-full p-3 border rounded-lg resize-none"
+          className={`${textareaBase} border-input`}
           rows={3}
           disabled={isSending}
         />
         <button
           onClick={handleSendMessage}
           disabled={!newMessage.trim() || isSending}
-          className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          className={`mt-2 ${getButtonClasses('primary', 'md')}`}
         >
           {isSending ? 'Sending...' : 'Send Message'}
         </button>

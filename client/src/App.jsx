@@ -9,16 +9,17 @@ import { LoginForm } from './Components/authentication/LoginForm'
 import { RegistrationForm } from './Components/authentication/RegistrationForm'
 import { ProtectedRoute } from './Components/authentication/ProtectedRoute';
 import { Layout } from './Components/authentication/Logout';
+import { cardVariants, cardPadding, typography, buttonVariants } from './styles';
 
 function Home() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md text-center">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">
+      <div className={`${cardVariants.default} ${cardPadding.lg} text-center`}>
+        <h1 className={`${typography.h1} mb-4`}>
           Apartment Tracker
         </h1>
         <nav className="mt-6 space-x-4">
-          <Link to="/issues" className="text-blue-600 hover:underline">
+          <Link to="/issues" className={buttonVariants.link}>
             View Issues
           </Link>
         </nav>

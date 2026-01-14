@@ -1,3 +1,5 @@
+import { getSelectClasses, getInputClasses } from "../styles/helpers";
+
 export const IssueFilters = ({ filters, onFilterChange }) => {
   return (
     <div className="flex gap-4 mb-4">
@@ -5,7 +7,7 @@ export const IssueFilters = ({ filters, onFilterChange }) => {
       <select
         value={filters.status}
         onChange={(e) => onFilterChange("status", e.target.value)}
-        className="border rounded px-3 py-2"
+        className={getSelectClasses()}
       >
         <option value="all">All Status</option>
         <option value="OPEN">Open</option>
@@ -18,7 +20,7 @@ export const IssueFilters = ({ filters, onFilterChange }) => {
       <select
         value={filters.priority}
         onChange={(e) => onFilterChange("priority", e.target.value)}
-        className="border rounded px-3 py-2"
+        className={getSelectClasses()}
       >
         <option value="all">All Priority</option>
         <option value="LOW">Low</option>
@@ -31,7 +33,7 @@ export const IssueFilters = ({ filters, onFilterChange }) => {
       <select
         value={filters.category}
         onChange={(e) => onFilterChange("category", e.target.value)}
-        className="border rounded px-3 py-2"
+        className={getSelectClasses()}
       >
         <option value="all">All Categories</option>
         <option value="PLUMBING">Plumbing</option>
@@ -55,14 +57,14 @@ export const IssueFilters = ({ filters, onFilterChange }) => {
           type="date"
           value={filters.startDate}
           onChange={(e) => onFilterChange("startDate", e.target.value)}
-          className="border rounded px-3 py-2 mr-2"
+          className={getInputClasses() + ' mr-2'}
         />
         <span className="mx-2">to</span>
         <input
           type="date"
           value={filters.endDate}
           onChange={(e) => onFilterChange("endDate", e.target.value)}
-          className="border rounded px-3 py-2"
+          className={getInputClasses()}
         />
       </div>
     </div>

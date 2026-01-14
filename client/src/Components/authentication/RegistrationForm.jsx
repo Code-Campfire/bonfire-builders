@@ -3,6 +3,7 @@ import { useAuth } from "../../context/context"
 import { useNavigate } from "react-router-dom";
 import { complexAPI, userAPI } from "../../services/api";
 import { EyeOff, Eye } from "lucide-react";
+import { getButtonClasses, getInputClasses, labelBase, errorText, cardVariants, cardPadding, typography } from "../../styles";
 
 export const RegistrationForm = () => {
     const navigate = useNavigate()
@@ -171,35 +172,33 @@ export const RegistrationForm = () => {
     }
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold mb-6 text-gray-800"> Please, Register</h3>
+        <div className={`${cardVariants.default} ${cardPadding.md} max-w-2xl mx-auto`}>
+            <h3 className={`${typography.h3} mb-6`}> Please, Register</h3>
             <form className="space-y-4">
                 <select
                     id="role"
                     name="role"
                     value={userFormData.role}
                     onChange={handleUserChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.role ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                    className={getInputClasses(!!errors.role)}
                 >
                     <option value="TENANT">Tenant</option>
                     <option value="LANDLORD">Landlord</option>
                 </select>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email: </label>
+                <label htmlFor="email" className={labelBase}>Email: </label>
                 <input
                     type="text"
                     value={userFormData.email}
                     id="email"
                     name="email"
                     onChange={handleUserChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                    className={getInputClasses(!!errors.email)}
                 />
                 {errors.email && (
-                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                    <p className={errorText}>{errors.email}</p>
                 )}
                 <br />
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password: </label>
+                <label htmlFor="password" className={labelBase}>Password: </label>
                 <div className="flex flex-row">
                 <input
                     type={showPassword ? "text" : "password"}
@@ -207,65 +206,61 @@ export const RegistrationForm = () => {
                     id="password_hash"
                     name="password_hash"
                     onChange={handleUserChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                    className={getInputClasses(!!errors.password)}
                 />
                 <button type="button" className="m-2" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff /> : <Eye />}</button>
                 </div>
                 {errors.password && (
-                    <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                    <p className={errorText}>{errors.password}</p>
                 )}
-                <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">First name: </label>
+                <label htmlFor="first_name" className={labelBase}>First name: </label>
                 <input
                     type="text"
                     value={userFormData.first_name}
                     id="first_name"
                     name="first_name"
                     onChange={handleUserChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.first_name ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                    className={getInputClasses(!!errors.first_name)}
                 />
                 {errors.first_name && (
-                    <p className="text-red-500 text-sm mt-1">{errors.first_name}</p>
+                    <p className={errorText}>{errors.first_name}</p>
                 )}
                 <br />
-                <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">Last name: </label>
+                <label htmlFor="last_name" className={labelBase}>Last name: </label>
                 <input
                     type="text"
                     value={userFormData.last_name}
                     id="last_name"
                     name="last_name"
                     onChange={handleUserChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.last_name ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                    className={getInputClasses(!!errors.last_name)}
                 />
                 {errors.last_name && (
-                    <p className="text-red-500 text-sm mt-1">{errors.last_name}</p>
+                    <p className={errorText}>{errors.last_name}</p>
                 )}
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone: </label>
+                <label htmlFor="phone" className={labelBase}>Phone: </label>
                 <input
                     type="text"
                     value={userFormData.phone}
                     id="phone"
                     name="phone"
                     onChange={handleUserChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                    className={getInputClasses(!!errors.phone)}
                 />
                 {errors.phone && (
-                    <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                    <p className={errorText}>{errors.phone}</p>
                 )}
                 <br />
                 {userFormData.role === "TENANT"
                     ?
                     <>
-                        <label htmlFor="complex_id" className="block text-sm font-medium text-gray-700 mb-1">Property/Complex: <span className="text-red-500">*</span></label>
+                        <label htmlFor="complex_id" className={labelBase}>Property/Complex: <span className="text-destructive">*</span></label>
                         <select
                             value={userFormData.complex_id}
                             id="complex_id"
                             name="complex_id"
                             onChange={handleUserChange}
-                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.complex_id ? 'border-red-500' : 'border-gray-300'}`}
+                            className={getInputClasses(!!errors.complex_id)}
                         >
                             <option value="">Select a property...</option>
                             {loadingComplexes ? (
@@ -281,9 +276,9 @@ export const RegistrationForm = () => {
                             )}
                         </select>
                         {errors.complex_id && (
-                            <p className="text-red-500 text-sm mt-1">{errors.complex_id}</p>
+                            <p className={errorText}>{errors.complex_id}</p>
                         )}
-                        <label htmlFor="building_name" className="block text-sm font-medium text-gray-700 mb-1 mt-4">Building name: <span className="text-gray-500 text-xs">(optional)</span></label>
+                        <label htmlFor="building_name" className={`${labelBase} mt-4`}>Building name: <span className="text-muted-foreground text-xs">(optional)</span></label>
                         <input
                             type="text"
                             value={userFormData.building_name}
@@ -291,30 +286,28 @@ export const RegistrationForm = () => {
                             name="building_name"
                             onChange={handleUserChange}
                             placeholder="e.g., Building A, North Tower (optional)"
-                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.building_name ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                            className={getInputClasses(!!errors.building_name)}
                         />
                         {errors.building_name && (
-                            <p className="text-red-500 text-sm mt-1">{errors.building_name}</p>
+                            <p className={errorText}>{errors.building_name}</p>
                         )}
-                        <label htmlFor="apartment_number" className="block text-sm font-medium text-gray-700 mb-1">Apartment number: </label>
+                        <label htmlFor="apartment_number" className={labelBase}>Apartment number: </label>
                         <input
                             type="text"
                             value={userFormData.apartment_number}
                             id="apartment_number"
                             name="apartment_number"
                             onChange={handleUserChange}
-                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.apartment_number ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                            className={getInputClasses(!!errors.apartment_number)}
                         />
                         {errors.apartment_number && (
-                            <p className="text-red-500 text-sm mt-1">{errors.apartment_number}</p>
+                            <p className={errorText}>{errors.apartment_number}</p>
                         )}
                     </>
                     :
                     <>
-                    <h3 className="text-1x1 font-bold mb-8 text-gray-800">Optional fields</h3>
-                    <label htmlFor="building_name" className="block text-sm font-medium text-gray-700 mb-1">Building name: <span className="text-gray-500 text-xs">(optional)</span></label>
+                    <h3 className={`${typography.h4} mb-8`}>Optional fields</h3>
+                    <label htmlFor="building_name" className={labelBase}>Building name: <span className="text-muted-foreground text-xs">(optional)</span></label>
                         <input
                             type="text"
                             value={userFormData.building_name}
@@ -322,43 +315,41 @@ export const RegistrationForm = () => {
                             name="building_name"
                             onChange={handleUserChange}
                             placeholder="e.g., Building A, North Tower (optional)"
-                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                            className={getInputClasses(false)}
                         />
-                        <label htmlFor="apartment_number" className="block text-sm font-medium text-gray-700 mb-1">Apartment number: </label>
+                        <label htmlFor="apartment_number" className={labelBase}>Apartment number: </label>
                         <input
                             type="text"
                             value={userFormData.apartment_number}
                             id="apartment_number"
                             name="apartment_number"
                             onChange={handleUserChange}
-                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                            className={getInputClasses(false)}
                         />
-                        <h3 className="text-1x1 font-bold mb-8 text-gray-800">Please, enter information about your apartment complex</h3>
-                        <label htmlFor="complex_name" className="block text-sm font-medium text-gray-700 mb-1">Complex name: </label>
+                        <h3 className={`${typography.h4} mb-8`}>Please, enter information about your apartment complex</h3>
+                        <label htmlFor="complex_name" className={labelBase}>Complex name: </label>
                         <input
                             type="text"
                             value={landlordComplexFormData.name}
                             id="name"
                             name="name"
                             onChange={handleComplexChange}
-                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                            className={getInputClasses(!!errors.name)}
                         />
                         {errors.name && (
-                            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                            <p className={errorText}>{errors.name}</p>
                         )}
-                        <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Complex address: </label>
+                        <label htmlFor="address" className={labelBase}>Complex address: </label>
                         <input
                             type="text"
                             value={landlordComplexFormData.address}
                             id="address"
                             name="address"
                             onChange={handleComplexChange}
-                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.address ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                            className={getInputClasses(!!errors.address)}
                         />
                         {errors.address && (
-                            <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+                            <p className={errorText}>{errors.address}</p>
                         )}
                     </>
                 }
@@ -366,13 +357,13 @@ export const RegistrationForm = () => {
             <div className="flex gap-3 pt-4">
                 <button
                     onClick={handleSubmit}
-                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                    className={getButtonClasses('primary', 'md', 'flex-1')}
                 >
                     Register
                 </button>
                 <button
                     onClick={() => { navigate("/login") }}
-                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                    className={getButtonClasses('primary', 'md', 'flex-1')}
                 >
                     Back to login
                 </button>

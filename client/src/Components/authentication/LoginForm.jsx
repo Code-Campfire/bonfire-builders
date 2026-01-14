@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../../context/context"
 import { useNavigate } from "react-router-dom";
 import { EyeOff, Eye } from "lucide-react";
+import { getButtonClasses, getInputClasses, labelBase, errorText, cardVariants, cardPadding, typography } from "../../styles";
 
 export const LoginForm = () => {
     const navigate = useNavigate()
@@ -64,24 +65,23 @@ export const LoginForm = () => {
     }
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold mb-6 text-gray-800"> Please, Log In</h3>
+        <div className={`${cardVariants.default} ${cardPadding.md} max-w-2xl mx-auto`}>
+            <h3 className={`${typography.h3} mb-6`}> Please, Log In</h3>
             <form className="space-y-4">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email: </label>
+                <label htmlFor="email" className={labelBase}>Email: </label>
                 <input
                     type="text"
                     value={formData.email}
                     id="email"
                     name="email"
                     onChange={handleChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                    className={getInputClasses(!!errors.email)}
                 />
                 {errors.email && (
-                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                    <p className={errorText}>{errors.email}</p>
                 )}
                 <br />
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password: </label>
+                <label htmlFor="password" className={labelBase}>Password: </label>
                 <div className="flex flex-row">
                 <input
                     type={showPassword ? 'text': 'password'}
@@ -89,25 +89,24 @@ export const LoginForm = () => {
                     id="password_hash"
                     name="password_hash"
                     onChange={handleChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password_hash ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                    className={getInputClasses(!!errors.password_hash)}
                 />
                 <button type="button" className="m-2" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff /> : <Eye />}</button>
                 </div>
                 {errors.password_hash && (
-                    <p className="text-red-500 text-sm mt-1">{errors.password_hash}</p>
+                    <p className={errorText}>{errors.password_hash}</p>
                 )}
             </form>
             <div className="flex gap-3 pt-4">
                 <button
                     onClick={handleSubmit}
-                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                    className={getButtonClasses('primary', 'md', 'flex-1')}
                 >
                     Login
                 </button>
                 <button
                     onClick={() => {navigate("/register")}}
-                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                    className={getButtonClasses('primary', 'md', 'flex-1')}
                 >
                     Register
                 </button>

@@ -1,23 +1,36 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../context/context';
-import { userAPI } from '../services/api';
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/context";
+import { userAPI } from "../services/api";
+import { getButtonClasses } from "../styles/helpers";
+import { colors } from "../styles/colors";
+import { toggleSwitch } from "../styles/buttons";
+import { typography } from "../styles/typography";
+import { spacing, flexRow } from "../styles/layout";
+import { Loader2Icon } from "lucide-react";
+import { toast } from "sonner";
 
 function Settings() {
   const { user, updateUser } = useAuth();
+  const [loading, setLoading] = useState(true);
 
   // Get preferences from user context, default to true if not set
   const initialPreference = user?.preferences?.emailNotifications ?? true;
 
-  const [emailNotifications, setEmailNotifications] = useState(initialPreference);
-  const [originalEmailNotifications, setOriginalEmailNotifications] = useState(initialPreference);
+  const [emailNotifications, setEmailNotifications] =
+    useState(initialPreference);
+  const [originalEmailNotifications, setOriginalEmailNotifications] =
+    useState(initialPreference);
   const [saving, setSaving] = useState(false);
 
   // Update state when user context changes (e.g., after login)
   useEffect(() => {
-    const preference = user?.preferences?.emailNotifications ?? true;
-    setEmailNotifications(preference);
-    setOriginalEmailNotifications(preference);
-  }, [user?.preferences?.emailNotifications]);
+    if (user) {
+      const preference = user.preferences?.emailNotifications ?? true;
+      setEmailNotifications(preference);
+      setOriginalEmailNotifications(preference);
+      setLoading(false);
+    }
+  }, [user]);
 
   const hasChanges = emailNotifications !== originalEmailNotifications;
 
@@ -30,55 +43,73 @@ function Settings() {
     try {
       const response = await userAPI.updateUser({
         id: user.id,
-        preferences: { emailNotifications }
+        preferences: { emailNotifications },
       });
 
       // Update context with fresh user data from response
       updateUser(response.user);
       setOriginalEmailNotifications(emailNotifications);
-      alert('Settings saved successfully!');
+      toast.success("Settings saved successfully!");
     } catch (error) {
-      console.error('Failed to save settings:', error);
-      alert('Failed to save settings. Please try again.');
+      console.error("Failed to save settings:", error);
+      toast.error("Failed to save settings. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6 max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold">Settings</h1>
+    <div className={spacing.p6}>
+      <div className={flexRow.spaceBetween + " mb-6 max-w-3xl mx-auto"}>
+        <h1 className={typography.h1}>Settings</h1>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-w-3xl mx-auto">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Notifications</h2>
+      <div
+        className={
+          colors.bgCard +
+          " rounded-lg shadow-sm border border-border " +
+          spacing.p6 +
+          " max-w-3xl mx-auto"
+        }
+      >
+        <h2 className={typography.h2 + " mb-6"}>Notifications</h2>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-gray-100">
+          <div
+            className={flexRow.spaceBetween + " py-3 border-b border-border"}
+          >
             <div className="flex-1">
-              <h3 className="text-sm font-medium text-gray-900">
+              <h3 className={typography.body + " font-medium"}>
                 Email notifications for landlord messages
               </h3>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className={colors.textMutedForeground + " text-sm mt-1"}>
                 Receive an email when your landlord sends you a message
               </p>
             </div>
-
-            <button
-              onClick={handleToggleNotifications}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                emailNotifications ? 'bg-blue-600' : 'bg-gray-200'
-              }`}
-              role="switch"
-              aria-checked={emailNotifications}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  emailNotifications ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
+            {loading ? (
+              <div className="w-11 h-6 flex items-center justify-center">
+                <Loader2Icon className="animate-spin h-5 w-5 text-muted-foreground" />
+              </div>
+            ) : (
+              <button
+                onClick={handleToggleNotifications}
+                className={
+                  emailNotifications
+                    ? toggleSwitch.active
+                    : toggleSwitch.inactive
+                }
+                role="switch"
+                aria-checked={emailNotifications}
+              >
+                <span
+                  className={
+                    emailNotifications
+                      ? toggleSwitch.thumbActive
+                      : toggleSwitch.thumbInactive
+                  }
+                />
+              </button>
+            )}
           </div>
         </div>
 
@@ -86,11 +117,16 @@ function Settings() {
           <button
             onClick={handleSaveChanges}
             disabled={saving}
-            className={`bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300 ease-in-out font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
-              hasChanges ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
-            }`}
+            className={
+              getButtonClasses("primary") +
+              ` transition-all duration-300 ease-in-out ${
+                hasChanges
+                  ? "opacity-100 scale-100"
+                  : "opacity-0 scale-95 pointer-events-none"
+              }`
+            }
           >
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saving ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </div>

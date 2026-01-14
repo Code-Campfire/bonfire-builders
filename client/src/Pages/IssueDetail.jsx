@@ -8,6 +8,12 @@ import { formatCategory } from "@/utils/categoryUtils";
 import { getDaysAgo } from "@/utils/dateUtils";
 import { issueAPI, photoAPI } from "../services/api";
 import { toast } from "sonner";
+import { getButtonClasses, getInputClasses, getSelectClasses, getTextareaClasses } from "../styles/helpers";
+import { colors, sections, iconColors } from "../styles/colors";
+import { buttonVariants } from "../styles/buttons";
+import { spacing, flexRow, flexCol, timeline } from "../styles/layout";
+import { typography } from "../styles/typography";
+import { selectBase, textareaBase } from "../styles/forms";
 import {
   Calendar,
   Camera,
@@ -123,8 +129,9 @@ const IssueDetail = () => {
       await photoAPI.deletePhoto(photoId);
       setIssue((prevIssue) => ({
         ...prevIssue,
-        photos: prevIssue.photos.filter((p) => p.id !== photoId),
+        photos: (prevIssue.photos || []).filter((p) => p.id !== photoId),
       }));
+      toast.success("Photo deleted successfully");
     } catch (err) {
       console.error("Failed to delete photo:", err);
       toast.error("Failed to delete photo. Please try again.");
@@ -247,11 +254,11 @@ const IssueDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className={colors.bgBackground + ' min-h-screen ' + spacing.p6}>
         <div className="max-w-5xl mx-auto">
-          <div className="flex items-center justify-center py-12">
+          <div className={flexCol.centerCenter + ' py-12'}>
             <svg
-              className="animate-spin h-12 w-12 text-blue-600"
+              className="animate-spin h-12 w-12 text-primary"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -278,16 +285,16 @@ const IssueDetail = () => {
 
   if (error || !issue) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className={colors.bgBackground + ' min-h-screen ' + spacing.p6}>
         <div className="max-w-5xl mx-auto">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+            className={getButtonClasses('link') + ' mb-6'}
           >
             <ArrowLeft className="h-5 w-5" />
             Back to Issues
           </button>
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          <div className={sections.alert.error}>
             <p>{error || "Issue not found"}</p>
             <button
               onClick={fetchIssueDetail}
@@ -302,30 +309,30 @@ const IssueDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className={colors.bgBackground + ' min-h-screen ' + spacing.p6}>
       <div className="max-w-5xl mx-auto">
         {/* Back Button */}
-        <div className="flex items-center justify-between mb-6">
+        <div className={flexRow.spaceBetween + ' mb-6'}>
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 text-blue-700 hover:text-rose-900 mb-4 transition-colors"
+            className={getButtonClasses('link') + ' mb-4'}
           >
             <ArrowLeft className="h-5 w-5" />
             Back to Maintenance Requests
           </button>
 
           {/* Action Buttons */}
-          <div className="flex gap-3">
+          <div className={flexRow.startCenter + ' ' + spacing.gap3}>
             <button
               onClick={handleEdit}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              className={getButtonClasses('primary')}
             >
               <Edit className="h-4 w-4" />
               Edit Issue
             </button>
             <button
               onClick={handleDelete}
-              className="flex items-center gap-2 px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors"
+              className={getButtonClasses('destructive')}
             >
               <Trash2 className="h-4 w-4" />
               Delete Issue
@@ -336,19 +343,19 @@ const IssueDetail = () => {
         {/* Main Issue Card */}
         <Card className="mb-6">
           <CardHeader className="border-b">
-            <div className="flex items-start justify-between gap-4">
+            <div className={flexRow.spaceBetween + ' ' + spacing.gap4}>
               <div className="flex-1">
-                <h1 className="text-3xl font-bold mb-2">{issue.title}</h1>
-                <div className="flex items-center gap-3 flex-wrap">
+                <h1 className={typography.h1 + ' mb-2'}>{issue.title}</h1>
+                <div className={flexRow.startCenter + ' ' + spacing.gap3 + ' flex-wrap'}>
                   <StatusBadge status={issue.status} />
                   <PriorityBadge priority={issue.priority} />
-                  <span className="px-3 py-1 bg-secondary rounded-md text-sm font-medium">
+                  <span className={colors.bgSecondary + ' px-3 py-1 rounded-md text-sm font-medium'}>
                     {formatCategory(issue.category)}
                   </span>
                 </div>
               </div>
-              <div className="text-right text-sm text-muted-foreground">
-                <div className="flex items-center gap-1 justify-end mb-1">
+              <div className={colors.textMutedForeground + ' text-right text-sm'}>
+                <div className={flexRow.startCenter + ' ' + spacing.gap1 + ' justify-end mb-1'}>
                   <Calendar className="h-4 w-4" />
                   <span>
                     Created {new Date(issue.createdAt).toLocaleDateString()}
@@ -364,16 +371,16 @@ const IssueDetail = () => {
           <CardContent className="pt-6">
             {/* Description */}
             <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-2">Description</h2>
-              <p className="text-black-700 whitespace-pre-wrap">
+              <h2 className={typography.h2 + ' mb-2'}>Description</h2>
+              <p className={colors.textForeground + ' whitespace-pre-wrap'}>
                 {issue.description}
               </p>
             </div>
 
             {/* Location */}
             <div className="mb-6">
-              <div className="flex items-center gap-2 text-gray-700">
-                <MapPin className="h-5 w-5 text-gray-500" />
+              <div className={flexRow.startCenter + ' ' + spacing.gap2 + ' ' + colors.textForeground}>
+                <MapPin className={iconColors.muted} />
                 <span className="font-medium">Location:</span>
                 <span>{issue.location}</span>
               </div>
@@ -381,32 +388,32 @@ const IssueDetail = () => {
 
             {/* Tenant Information */}
             {issue.user && (
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <div className={sections.info + ' mb-6'}>
+                <h2 className={typography.h2 + ' mb-3 ' + flexRow.startCenter + ' ' + spacing.gap2}>
                   <User className="h-5 w-5" />
                   Reported By
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-gray-500" />
+                  <div className={flexRow.startCenter + ' ' + spacing.gap2}>
+                    <User className={iconColors.muted} />
                     <span className="font-medium">Name:</span>
                     <span>
                       {issue.user.first_name} {issue.user.last_name}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-gray-500" />
+                  <div className={flexRow.startCenter + ' ' + spacing.gap2}>
+                    <Mail className={iconColors.muted} />
                     <span className="font-medium">Email:</span>
                     <span>{issue.user.email}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Building className="h-4 w-4 text-gray-500" />
+                  <div className={flexRow.startCenter + ' ' + spacing.gap2}>
+                    <Building className={iconColors.muted} />
                     <span className="font-medium">Unit:</span>
                     <span>{issue.user.apartment_number}</span>
                   </div>
                   {issue.user.phone && (
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-gray-500" />
+                    <div className={flexRow.startCenter + ' ' + spacing.gap2}>
+                      <Phone className={iconColors.muted} />
                       <span className="font-medium">Phone:</span>
                       <span>{issue.user.phone}</span>
                     </div>
@@ -417,19 +424,19 @@ const IssueDetail = () => {
 
             {/* Complex Information */}
             {issue.complex && (
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <div className={sections.info + ' mb-6'}>
+                <h2 className={typography.h2 + ' mb-3 ' + flexRow.startCenter + ' ' + spacing.gap2}>
                   <Building className="h-5 w-5" />
                   Property
                 </h2>
                 <div className="text-sm">
                   <div className="font-medium">{issue.complex.name}</div>
                   {issue.user?.building_name && (
-                    <div className="text-gray-700">
+                    <div className={colors.textForeground}>
                       Building: {issue.user.building_name}
                     </div>
                   )}
-                  <div className="text-gray-600">{issue.complex.address}</div>
+                  <div className={colors.textMutedForeground}>{issue.complex.address}</div>
                 </div>
               </div>
             )}
@@ -440,14 +447,14 @@ const IssueDetail = () => {
         {user?.role === "LANDLORD" && (
           <Card className="mb-6">
             <CardHeader>
-              <h2 className="text-xl font-bold">Update Status</h2>
+              <h2 className={typography.h2}>Update Status</h2>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-4 items-center">
+              <div className={flexRow.startCenter + ' ' + spacing.gap4}>
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="px-3 py-2 border rounded-md"
+                  className={getSelectClasses()}
                 >
                   <option value="">Select new status</option>
                   <option value="IN_PROGRESS">In Progress</option>
@@ -461,7 +468,7 @@ const IssueDetail = () => {
                     !selectedStatus ||
                     selectedStatus === issue?.status
                   }
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  className={getButtonClasses('primary')}
                 >
                   {updatingStatus ? "Updating..." : "Update Status"}
                 </button>
@@ -473,7 +480,7 @@ const IssueDetail = () => {
         {/* Timeline Card */}
         <Card className="mb-6">
           <CardHeader>
-            <h2 className="text-xl font-bold flex items-center gap-2">
+            <h2 className={typography.h2 + ' ' + flexRow.startCenter + ' ' + spacing.gap2}>
               <Clock className="h-5 w-5" />
               Timeline
             </h2>
@@ -481,20 +488,20 @@ const IssueDetail = () => {
           <CardContent>
             <div className="space-y-4">
               {/* Created Event */}
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <div className="w-0.5 h-full bg-gray-200 mt-1"></div>
+              <div className={timeline.item}>
+                <div className={timeline.dotContainer}>
+                  <div className={timeline.dot.blue}></div>
+                  <div className={timeline.line}></div>
                 </div>
-                <div className="flex-1 pb-4">
-                  <div className="flex items-center gap-2 mb-1">
+                <div className={timeline.content}>
+                  <div className={flexRow.startCenter + ' ' + spacing.gap2 + ' mb-1'}>
                     <span className="font-semibold">Issue Created</span>
                     <StatusBadge status="OPEN" />
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className={colors.textMutedForeground + ' text-sm'}>
                     {new Date(issue.createdAt).toLocaleString()}
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">
+                  <div className={colors.textMutedForeground + ' text-sm mt-1'}>
                     Reported by {issue.user?.first_name} {issue.user?.last_name}
                   </div>
                 </div>
@@ -502,20 +509,20 @@ const IssueDetail = () => {
 
               {/* Acknowledged Event */}
               {issue.acknowledged_date && (
-                <div className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <div className="w-0.5 h-full bg-gray-200 mt-1"></div>
+                <div className={timeline.item}>
+                  <div className={timeline.dotContainer}>
+                    <div className={timeline.dot.green}></div>
+                    <div className={timeline.line}></div>
                   </div>
-                  <div className="flex-1 pb-4">
-                    <div className="flex items-center gap-2 mb-1">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                  <div className={timeline.content}>
+                    <div className={flexRow.startCenter + ' ' + spacing.gap2 + ' mb-1'}>
+                      <CheckCircle className={iconColors.success} />
                       <span className="font-semibold">Issue Acknowledged</span>
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className={colors.textMutedForeground + ' text-sm'}>
                       {new Date(issue.acknowledged_date).toLocaleString()}
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">
+                    <div className={colors.textMutedForeground + ' text-sm mt-1'}>
                       Management has been notified
                     </div>
                   </div>
@@ -524,20 +531,20 @@ const IssueDetail = () => {
 
               {/* Resolved Event */}
               {issue.resolved_date && (
-                <div className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                    <div className="w-0.5 h-full bg-gray-200 mt-1"></div>
+                <div className={timeline.item}>
+                  <div className={timeline.dotContainer}>
+                    <div className={timeline.dot.green}></div>
+                    <div className={timeline.line}></div>
                   </div>
-                  <div className="flex-1 pb-4">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className={timeline.content}>
+                    <div className={flexRow.startCenter + ' ' + spacing.gap2 + ' mb-1'}>
                       <span className="font-semibold">Issue Resolved</span>
                       <StatusBadge status="RESOLVED" />
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className={colors.textMutedForeground + ' text-sm'}>
                       {new Date(issue.resolved_date).toLocaleString()}
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">
+                    <div className={colors.textMutedForeground + ' text-sm mt-1'}>
                       Issue has been fixed
                     </div>
                   </div>
@@ -546,19 +553,19 @@ const IssueDetail = () => {
 
               {/* Closed Event */}
               {issue.closed_date && (
-                <div className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
+                <div className={timeline.item}>
+                  <div className={timeline.dotContainer}>
+                    <div className={timeline.dot.gray}></div>
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className={flexRow.startCenter + ' ' + spacing.gap2 + ' mb-1'}>
                       <span className="font-semibold">Issue Closed</span>
                       <StatusBadge status="CLOSED" />
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className={colors.textMutedForeground + ' text-sm'}>
                       {new Date(issue.closed_date).toLocaleString()}
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">
+                    <div className={colors.textMutedForeground + ' text-sm mt-1'}>
                       Issue marked as complete
                     </div>
                   </div>
@@ -567,16 +574,16 @@ const IssueDetail = () => {
 
               {/* Current Status if Still Open */}
               {!issue.closed_date && (
-                <div className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                <div className={timeline.item}>
+                  <div className={timeline.dotContainer}>
+                    <div className={timeline.dot.blue + ' animate-pulse'}></div>
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className={flexRow.startCenter + ' ' + spacing.gap2 + ' mb-1'}>
                       <span className="font-semibold">Current Status</span>
                       <StatusBadge status={issue.status} />
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className={colors.textMutedForeground + ' text-sm'}>
                       {issue.status === "OPEN" &&
                         "Awaiting response from management"}
                       {issue.status === "IN_PROGRESS" && "Work in progress"}
@@ -593,7 +600,7 @@ const IssueDetail = () => {
         {/* Photos Section */}
         <Card className="mb-6">
           <CardHeader>
-            <h2 className="text-xl font-bold flex items-center gap-2">
+            <h2 className={typography.h2 + ' ' + flexRow.startCenter + ' ' + spacing.gap2}>
               <Camera className="h-5 w-5" />
               Photos ({issue.photos?.length || 0})
             </h2>
@@ -603,7 +610,7 @@ const IssueDetail = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {issue.photos.map((photo, index) => (
                   <div key={photo.id} className="space-y-2">
-                    <div className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                    <div className={colors.bgMuted + ' group relative aspect-square rounded-lg overflow-hidden'}>
                       <img
                         src={photo.file_path}
                         alt={photo.caption || "Issue photo"}
@@ -612,7 +619,7 @@ const IssueDetail = () => {
                       />
                       <button
                         onClick={() => handleDeletePhoto(photo.id)}
-                        className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                        className="absolute top-2 right-2 bg-destructive text-destructive-foreground p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/90"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -624,23 +631,23 @@ const IssueDetail = () => {
                           <div className="space-y-2">
                             <textarea
                               maxLength={500}
-                              className="w-full text-sm p-2 border rounded"
+                              className={getTextareaClasses()}
                               value={editingCaptionText}
                               onChange={(e) =>
                                 setEditingCaptionText(e.target.value)
                               }
                               autoFocus
                             />
-                            <div className="flex gap-2">
+                            <div className={flexRow.startCenter + ' ' + spacing.gap2}>
                               <button
                                 onClick={() => handleSaveCaption(photo.id)}
-                                className="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                className={getButtonClasses('primary', 'sm')}
                               >
                                 Save
                               </button>
                               <button
                                 onClick={handleCancelEdit}
-                                className="text-sm px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                                className={getButtonClasses('outline', 'sm')}
                               >
                                 Cancel
                               </button>
@@ -648,11 +655,11 @@ const IssueDetail = () => {
                           </div>
                         ) : (
                           // View mode
-                          <div className="relative text-sm text-gray-700 p-2 rounded hover:bg-gray-50 group">
+                          <div className={colors.textForeground + ' relative text-sm p-2 rounded hover:bg-muted group'}>
                             <div className="pr-8">{photo.caption}</div>
                             <button
                               onClick={() => handleEditCaption(photo)}
-                              className="absolute top-1 right-1 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-200"
+                              className="absolute top-1 right-1 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent"
                             >
                               <Pencil className="h-4 w-4" />
                             </button>
@@ -662,14 +669,14 @@ const IssueDetail = () => {
                         // No caption yet - add caption mode
                         <div className="space-y-2">
                           <textarea
-                            className="w-full text-sm p-2 border rounded"
+                            className={getTextareaClasses()}
                             placeholder="Caption..."
                             id={photo.id}
                             onChange={handleCaptionChange}
                           />
                           <button
                             id={photo.id}
-                            className="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            className={getButtonClasses('primary', 'sm')}
                             onClick={handleCaptionUpdate}
                           >
                             Add Caption
@@ -681,8 +688,8 @@ const IssueDetail = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Camera className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+              <div className={colors.textMutedForeground + ' text-center py-8'}>
+                <Camera className={iconColors.muted + ' h-12 w-12 mx-auto mb-2'} />
                 <p>No photos uploaded yet</p>
               </div>
             )}
@@ -691,15 +698,13 @@ const IssueDetail = () => {
               issueId={id}
               onUploadComplete={(newPhotos) => {
                 setIssue((prevIssue) => {
-                  const updatedIssue = {
+                  const existingPhotos = prevIssue.photos || [];
+                  const photosToAdd = Array.isArray(newPhotos) ? newPhotos : [newPhotos];
+                  
+                  return {
                     ...prevIssue,
-                    photos: [
-                      ...prevIssue.photos,
-                      ...(Array.isArray(newPhotos) ? newPhotos : [newPhotos]),
-                    ],
+                    photos: [...existingPhotos, ...photosToAdd],
                   };
-
-                  return updatedIssue;
                 });
               }}
             />
@@ -709,7 +714,7 @@ const IssueDetail = () => {
         {/* Messages Section */}
         <Card id="messages-section">
           <CardHeader>
-            <h2 className="text-xl font-bold flex items-center gap-2">
+            <h2 className={typography.h2 + ' ' + flexRow.startCenter + ' ' + spacing.gap2}>
               <MessageSquare className="h-5 w-5" />
               Messages ({issue.messages?.length || 0})
             </h2>

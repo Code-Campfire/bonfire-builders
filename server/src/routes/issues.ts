@@ -7,7 +7,26 @@ const router = express.Router();
 // GET all issues (requires authentication)
 router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
+    // Build WHERE clause based on role
+    let whereClause = {};
+
+    if (req.user?.role === 'TENANT') {
+      // Tenants only see issues they created
+      whereClause = {
+        user_id: req.user.id
+      };
+    } else if (req.user?.role === 'LANDLORD') {
+      // Landlords see all issues in their complex
+      whereClause = {
+        complex_id: req.user.complex_id
+      };
+    } else if (req.user?.role === 'ADMIN') {
+      // Admins see everything - no filter
+      whereClause = {};
+    }
+
     const issues = await prisma.issue.findMany({
+      where: whereClause,
       include: {
         user: {
           select: {
@@ -49,6 +68,27 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 // GET all messages for a specific issue (requires authentication)
 router.get('/:id/messages', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
+    // First, check if the issue exists and user has permission
+    const issue = await prisma.issue.findUnique({
+      where: { id: Number(req.params.id) },
+      select: { user_id: true, complex_id: true }
+    });
+
+    if (!issue) {
+      return res.status(404).json({ error: 'Issue not found' });
+    }
+
+    // Authorization check
+    const isAuthorized = 
+      req.user?.role === 'ADMIN' ||
+      (req.user?.role === 'TENANT' && issue.user_id === req.user.id) ||
+      (req.user?.role === 'LANDLORD' && issue.complex_id === req.user.complex_id);
+
+    if (!isAuthorized) {
+      return res.status(403).json({ error: 'You do not have permission to view these messages' });
+    }
+
+    // User is authorized - fetch and return messages
     const messages = await prisma.message.findMany({
       where: {
         issue_id: Number(req.params.id)
@@ -103,6 +143,17 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
       return res.status(404).json({ error: 'Issue not found' });
     }
 
+    // Authorization check based on role
+    const isAuthorized = 
+      req.user?.role === 'ADMIN' || // Admins can see everything
+      (req.user?.role === 'TENANT' && issue.user_id === req.user.id) || // Tenant owns it
+      (req.user?.role === 'LANDLORD' && issue.complex_id === req.user.complex_id); // Landlord's complex
+
+    if (!isAuthorized) {
+      return res.status(403).json({ error: 'You do not have permission to view this issue' });
+    }
+
+    // User is authorized - return the issue
     res.json(issue);
   } catch (error: any) {
     console.error('Error fetching issue:', error);
@@ -164,6 +215,29 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
       }
     });
 
+    // Notify all landlords in the complex about the new issue
+    if (req.user?.role === 'TENANT') {
+      const landlords = await prisma.user.findMany({
+        where: {
+          complex_id: user.complex_id,
+          role: 'LANDLORD'
+        }
+      });
+
+      // Create in-app notifications for all landlords
+      for (const landlord of landlords) {
+        await prisma.notification.create({
+          data: {
+            user_id: landlord.id,
+            type: 'ISSUE_CREATED',
+            title: 'New maintenance issue reported',
+            message: `${req.user.first_name} ${req.user.last_name} reported: "${title.trim()}"`,
+            issue_id: newIssue.id
+          }
+        });
+      }
+    }
+
     res.status(201).json(newIssue);
   } catch (error: any) {
     console.error('Error creating issue:', error);
@@ -185,19 +259,28 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     // Verify issue exists and check ownership
     const existingIssue = await prisma.issue.findUnique({
       where: { id: issueId },
-      select: { user_id: true }
+      select: { user_id: true, complex_id: true }
     });
 
     if (!existingIssue) {
       return res.status(404).json({ error: 'Issue not found' });
     }
 
-    // Only the issue owner or landlord can update
-    if (req.user?.role !== 'LANDLORD' && existingIssue.user_id !== userId) {
+    // Tenants can only update their own issues
+    if (req.user?.role === 'TENANT' && existingIssue.user_id !== userId) {
       return res.status(403).json({ 
         error: 'You do not have permission to update this issue' 
       });
     }
+
+    // Landlords can only update issues in their complex
+    if (req.user?.role === 'LANDLORD' && existingIssue.complex_id !== req.user.complex_id) {
+      return res.status(403).json({ 
+        error: 'You can only update issues in your complex' 
+      });
+    }
+
+    // Admins can update anything (no additional check needed)
 
     // Fetch current issue to check existing dates
     const currentIssue = await prisma.issue.findUnique({
@@ -261,6 +344,55 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
         complex: true
       }
     });
+
+    // Send notifications to tenant when landlord updates the issue
+    if (req.user && req.user.role === 'LANDLORD' && existingIssue.user_id !== userId) {
+      let notificationTitle = '';
+      let notificationMessage = '';
+      let notificationType: 'ISSUE_STATUS_CHANGED' | 'ISSUE_ACKNOWLEDGED' | 'ISSUE_RESOLVED' | 'ISSUE_CLOSED' | 'ISSUE_PRIORITY_CHANGED' = 'ISSUE_STATUS_CHANGED';
+
+      // Determine notification type and message based on what was updated
+      if (status && status !== currentIssue.acknowledged_date) {
+        if (status === 'IN_PROGRESS' && !currentIssue.acknowledged_date) {
+          notificationType = 'ISSUE_ACKNOWLEDGED';
+          notificationTitle = 'Issue acknowledged';
+          notificationMessage = `${req.user.first_name} ${req.user.last_name} has acknowledged your issue "${updatedIssue.title}"`;
+        } else if (status === 'RESOLVED') {
+          notificationType = 'ISSUE_RESOLVED';
+          notificationTitle = 'Issue resolved';
+          notificationMessage = `${req.user.first_name} ${req.user.last_name} marked your issue "${updatedIssue.title}" as resolved`;
+        } else if (status === 'CLOSED') {
+          notificationType = 'ISSUE_CLOSED';
+          notificationTitle = 'Issue closed';
+          notificationMessage = `${req.user.first_name} ${req.user.last_name} closed your issue "${updatedIssue.title}"`;
+        } else {
+          notificationType = 'ISSUE_STATUS_CHANGED';
+          notificationTitle = 'Issue status updated';
+          notificationMessage = `${req.user.first_name} ${req.user.last_name} updated the status of "${updatedIssue.title}" to ${status.replace('_', ' ').toLowerCase()}`;
+        }
+      } else if (priority && priority !== req.body.originalPriority) {
+        notificationType = 'ISSUE_PRIORITY_CHANGED';
+        notificationTitle = 'Issue priority changed';
+        notificationMessage = `${req.user.first_name} ${req.user.last_name} changed the priority of "${updatedIssue.title}" to ${priority}`;
+      } else {
+        // General update
+        notificationTitle = 'Issue updated';
+        notificationMessage = `${req.user.first_name} ${req.user.last_name} updated your issue "${updatedIssue.title}"`;
+      }
+
+      // Create in-app notification for the tenant
+      if (notificationMessage) {
+        await prisma.notification.create({
+          data: {
+            user_id: existingIssue.user_id,
+            type: notificationType,
+            title: notificationTitle,
+            message: notificationMessage,
+            issue_id: updatedIssue.id
+          }
+        });
+      }
+    }
 
     res.json(updatedIssue);
   } catch (error: any) {

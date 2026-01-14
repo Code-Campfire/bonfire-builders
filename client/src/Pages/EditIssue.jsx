@@ -3,6 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { issueAPI } from '../services/api';
 import { formatCategory } from '../utils/categoryUtils';
+import { getButtonClasses, getInputClasses, getSelectClasses, getTextareaClasses } from '../styles/helpers';
+import { colors } from '../styles/colors';
+import { labelBase } from '../styles/forms';
+import { typography } from '../styles/typography';
+import { spacing, flexRow, flexCol } from '../styles/layout';
 
 const CATEGORIES = [
   'PLUMBING', 'ELECTRICAL', 'HVAC', 'STRUCTURAL', 'APPLIANCE',
@@ -78,20 +83,20 @@ export default function EditIssue() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className={colors.bgBackground + ' min-h-screen ' + flexCol.centerCenter}>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className={colors.bgBackground + ' min-h-screen ' + flexCol.centerCenter}>
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
+          <p className={colors.textDestructive + ' mb-4'}>{error}</p>
           <button
             onClick={() => navigate('/issues')}
-            className="text-blue-600 hover:text-blue-700"
+            className={getButtonClasses('link')}
           >
             Back to Issues
           </button>
@@ -101,26 +106,26 @@ export default function EditIssue() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className={colors.bgBackground + ' min-h-screen ' + spacing.p6}>
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <button
             onClick={() => navigate(`/issues/${id}`)}
-            className="flex items-center gap-2 text-blue-700 hover:text-rose-900 transition-colors mb-4"
+            className={getButtonClasses('link') + ' mb-4'}
           >
             <ArrowLeft className="w-5 h-5" />
             <span className="font-medium">Back to Maintenance Request</span>
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 text-center">Edit Issue</h1>
+          <h1 className={typography.h1 + ' text-center'}>Edit Issue</h1>
         </div>
 
         {/* Form */}
-        <div className="bg-gray-400 rounded-lg shadow-md p-6">
+        <div className={colors.bgCard + ' rounded-lg shadow-md ' + spacing.p6}>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-900 mb-2">
+              <label htmlFor="title" className={labelBase}>
                 Issue Title *
               </label>
               <input
@@ -129,7 +134,7 @@ export default function EditIssue() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={getInputClasses()}
                 placeholder="Brief description of the issue"
                 required
               />
@@ -137,7 +142,7 @@ export default function EditIssue() {
 
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-900 mb-2">
+              <label htmlFor="description" className={labelBase}>
                 Description *
               </label>
               <textarea
@@ -146,7 +151,7 @@ export default function EditIssue() {
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={getTextareaClasses()}
                 placeholder="Detailed description of the issue"
                 required
               />
@@ -154,7 +159,7 @@ export default function EditIssue() {
 
             {/* Category */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-900 mb-2">
+              <label htmlFor="category" className={labelBase}>
                 Category *
               </label>
               <select
@@ -162,7 +167,7 @@ export default function EditIssue() {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={getSelectClasses()}
                 required
               >
                 <option value="">Select a category</option>
@@ -176,7 +181,7 @@ export default function EditIssue() {
 
             {/* Priority */}
             <div>
-              <label htmlFor="priority" className="block text-sm font-medium text-gray-900 mb-2">
+              <label htmlFor="priority" className={labelBase}>
                 Priority *
               </label>
               <select
@@ -184,7 +189,7 @@ export default function EditIssue() {
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={getSelectClasses()}
                 required
               >
                 <option value="">Select priority</option>
@@ -198,7 +203,7 @@ export default function EditIssue() {
 
             {/* Location */}
             <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-900 mb-2">
+              <label htmlFor="location" className={labelBase}>
                 Location *
               </label>
               <input
@@ -207,25 +212,25 @@ export default function EditIssue() {
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={getInputClasses()}
                 placeholder="e.g., Kitchen, Bathroom, Living Room"
                 required
               />
             </div>
 
             {/* Submit Button */}
-            <div className="flex gap-3 pt-4">
+            <div className={flexRow.startCenter + ' ' + spacing.gap3 + ' pt-4'}>
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-green-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className={'flex-1 ' + getButtonClasses('primary')}
               >
                 {submitting ? 'Saving Changes...' : 'Save Changes'}
               </button>
               <button
                 type="button"
                 onClick={() => navigate(`/issues/${id}`)}
-                className="px-6 py-3 bg-rose-900 text-white rounded-lg hover:bg-white hover:text-gray-900 border border-rose-700 transition-all font-medium"
+                className={getButtonClasses('outline')}
               >
                 Cancel
               </button>

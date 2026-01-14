@@ -8,6 +8,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { X } from "lucide-react";
+import { typography } from "../styles/typography";
+import { sectionBg } from "../styles/colors";
 
 export function PhotoCarousel({ photos, initialIndex = 0, isOpen, onClose }) {
   const [api, setApi] = useState();
@@ -69,14 +71,14 @@ export function PhotoCarousel({ photos, initialIndex = 0, isOpen, onClose }) {
                       />
                     </CardContent>
                     {(photo.caption || photo.uploaded_at) && (
-                      <CardFooter className="flex flex-col items-start justify-end p-4 bg-gray-900 rounded-b-lg">
+                      <CardFooter className={'flex flex-col items-start justify-end p-4 rounded-b-lg ' + sectionBg.carouselFooter}>
                         {photo.caption && (
-                          <p className="text-sm text-white mb-2 break-words">
+                          <p className={typography.small + ' text-white mb-2 break-words'}>
                             {photo.caption}
                           </p>
                         )}
                         {photo.uploaded_at && (
-                          <p className="text-xs text-gray-300">
+                          <p className={typography.xsmall + ' text-slate-300'}>
                             Uploaded:{" "}
                             {new Date(photo.uploaded_at).toLocaleString([], {
                               year: "numeric",

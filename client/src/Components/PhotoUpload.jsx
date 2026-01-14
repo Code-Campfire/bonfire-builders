@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { photoAPI } from "../services/api";
+import { getButtonClasses } from "../styles/helpers";
+import { colors, alerts } from "../styles/colors";
+import { typography } from "../styles/typography";
 
 export const PhotoUpload = ({ issueId, onUploadComplete }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -8,7 +11,11 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
 
   const handleFileSelect = (e) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) {
+      // Reset input even if no files selected
+      e.target.value = '';
+      return;
+    }
 
     const fileArray = Array.from(files);
 
@@ -26,8 +33,15 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
       return true;
     });
 
-    setSelectedFiles(validFiles);
-    setUploadError(null);
+    if (validFiles.length > 0) {
+      setSelectedFiles(validFiles);
+      setUploadError(null);
+    }
+    
+    // Reset the input value AFTER processing so the same file can be selected again
+    setTimeout(() => {
+      e.target.value = '';
+    }, 100);
   };
 
   const handleUpload = async () => {
@@ -75,6 +89,13 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
 
       // Clear selection and refresh
       setSelectedFiles([]);
+      
+      // Reset the file input
+      const fileInput = document.getElementById("photo-upload");
+      if (fileInput) {
+        fileInput.value = '';
+      }
+      
       onUploadComplete(savedPhotos);
     } catch (err) {
       console.error("Upload failed:", err);
@@ -99,13 +120,13 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
 
       {/* Selected Files Preview */}
       {selectedFiles.length > 0 && (
-        <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-          <h3 className="font-medium mb-2">
+        <div className={colors.bgMuted + ' mb-4 p-4 rounded-lg'}>
+          <h3 className={typography.label + ' mb-2'}>
             Selected Files ({selectedFiles.length})
           </h3>
           <div className="space-y-2">
             {selectedFiles.map((file, index) => (
-              <div key={index} className="text-sm text-gray-600">
+              <div key={index} className={typography.smallMuted}>
                 {file.name} ({(file.size / 1024).toFixed(1)} KB)
               </div>
             ))}
@@ -115,7 +136,7 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
 
       {/* Error Message */}
       {uploadError && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+        <div className={alerts.error + ' mb-4'}>
           {uploadError}
         </div>
       )}
@@ -124,7 +145,7 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
       <div className="flex gap-3 justify-center">
         <label
           htmlFor="photo-upload"
-          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+          className={getButtonClasses('primary') + ' cursor-pointer'}
         >
           Select Photos
         </label>
@@ -133,7 +154,7 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
           <button
             onClick={handleUpload}
             disabled={uploading}
-            className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400"
+            className={getButtonClasses('primary')}
           >
             {uploading
               ? "Uploading..."

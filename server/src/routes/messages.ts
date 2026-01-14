@@ -70,6 +70,30 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
       });
     }
 
+    // Send notifications to landlords if tenant sent message
+    if (req.user && req.user.role === 'TENANT') {
+      const landlords = await prisma.user.findMany({
+        where: {
+          complex_id: issue.complex_id,
+          role: 'LANDLORD'
+        }
+      });
+
+      // Create in-app notifications for all landlords
+      for (const landlord of landlords) {
+        await prisma.notification.create({
+          data: {
+            user_id: landlord.id,
+            type: 'MESSAGE_RECEIVED',
+            title: 'New message from tenant',
+            message: `${req.user.first_name} ${req.user.last_name} replied to "${issue.title}"`,
+            issue_id: issue.id,
+            message_id: message.id
+          }
+        });
+      }
+    }
+
     // Emit real-time event
     const io = req.app.get('io');
     io.to(`issue-${issue_id}`).emit('new-message', message);

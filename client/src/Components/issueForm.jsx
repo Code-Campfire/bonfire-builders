@@ -1,4 +1,15 @@
 import { useState } from 'react';
+import { 
+  getButtonClasses, 
+  getInputClasses, 
+  getSelectClasses, 
+  getTextareaClasses,
+  labelBase, 
+  errorText, 
+  typography,
+  spacing 
+} from '../styles';
+import { sectionBg } from '../styles/colors';
 
 const IssueForm = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -70,13 +81,13 @@ const IssueForm = ({ onSubmit, onCancel }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Report New Issue</h2>
+    <div className={sectionBg.success + ' p-6 rounded-lg shadow-md max-w-2xl mx-auto'}>
+      <h2 className={`${typography.h3} mb-6`}>Report New Issue</h2>
       
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className={spacing.stack}>
         {/* Title Input */}
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="title" className={labelBase}>
             Title *
           </label>
           <input
@@ -85,19 +96,17 @@ const IssueForm = ({ onSubmit, onCancel }) => {
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.title ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getInputClasses(!!errors.title)}
             placeholder="Brief description of the issue"
           />
           {errors.title && (
-            <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+            <p className={errorText}>{errors.title}</p>
           )}
         </div>
 
         {/* Description Textarea */}
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="description" className={labelBase}>
             Description *
           </label>
           <textarea
@@ -106,19 +115,17 @@ const IssueForm = ({ onSubmit, onCancel }) => {
             value={formData.description}
             onChange={handleChange}
             rows="4"
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.description ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getTextareaClasses(!!errors.description)}
             placeholder="Provide detailed information about the issue"
           />
           {errors.description && (
-            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+            <p className={errorText}>{errors.description}</p>
           )}
         </div>
 
         {/* Category Dropdown */}
         <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="category" className={labelBase}>
             Category *
           </label>
           <select
@@ -126,9 +133,7 @@ const IssueForm = ({ onSubmit, onCancel }) => {
             name="category"
             value={formData.category}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.category ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getSelectClasses(!!errors.category)}
           >
             <option value="">Select a category</option>
             <option value="PLUMBING">Plumbing</option>
@@ -146,13 +151,13 @@ const IssueForm = ({ onSubmit, onCancel }) => {
             <option value="OTHER">Other</option>
           </select>
           {errors.category && (
-            <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+            <p className={errorText}>{errors.category}</p>
           )}
         </div>
 
         {/* Priority Dropdown */}
         <div>
-          <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="priority" className={labelBase}>
             Priority *
           </label>
           <select
@@ -160,9 +165,7 @@ const IssueForm = ({ onSubmit, onCancel }) => {
             name="priority"
             value={formData.priority}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.priority ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getSelectClasses(!!errors.priority)}
           >
             <option value="">Select priority level</option>
             <option value="LOW">Low - Can wait</option>
@@ -171,13 +174,13 @@ const IssueForm = ({ onSubmit, onCancel }) => {
             <option value="URGENT">Urgent - Immediate action required</option>
           </select>
           {errors.priority && (
-            <p className="text-red-500 text-sm mt-1">{errors.priority}</p>
+            <p className={errorText}>{errors.priority}</p>
           )}
         </div>
 
         {/* Location Input */}
         <div>
-          <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="location" className={labelBase}>
             Location *
           </label>
           <input
@@ -186,13 +189,11 @@ const IssueForm = ({ onSubmit, onCancel }) => {
             name="location"
             value={formData.location}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.location ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={getInputClasses(!!errors.location)}
             placeholder="e.g., Kitchen, Bedroom, Unit 4B"
           />
           {errors.location && (
-            <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+            <p className={errorText}>{errors.location}</p>
           )}
         </div>
 
@@ -200,7 +201,7 @@ const IssueForm = ({ onSubmit, onCancel }) => {
         <div className="flex gap-3 pt-4">
           <button
             type="submit"
-            className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            className={getButtonClasses('primary', 'md', 'flex-1')}
           >
             Submit Issue
           </button>
@@ -208,7 +209,7 @@ const IssueForm = ({ onSubmit, onCancel }) => {
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors"
+              className={getButtonClasses('secondary', 'md', 'flex-1')}
             >
               Cancel
             </button>

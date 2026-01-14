@@ -13,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { iconColors } from '../styles/colors';
 
 const IssueCard = ({ issue = mockIssue }) => {
   function standardizeIssueDescriptionLength(issueDescription){
@@ -61,8 +62,8 @@ const IssueCard = ({ issue = mockIssue }) => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="inline-flex items-center text-green-600 cursor-pointer">
-                      <CheckCircle className="h-4 w-4 hover:text-green-800" />
+                    <span className="inline-flex items-center cursor-pointer">
+                      <CheckCircle className={'h-4 w-4 ' + iconColors.acknowledged} />
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>

@@ -3,6 +3,10 @@ import { Bell, Loader2 } from "lucide-react";
 import { notificationAPI } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { formatTimeAgo } from "../utils/timeUtils";
+import { getButtonClasses } from "../styles/helpers";
+import { colors, navbar } from "../styles/colors";
+import { typography } from "../styles/typography";
+import { flexRow, flexCol } from "../styles/layout";
 
 export const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -106,13 +110,13 @@ export const NotificationBell = () => {
       {/* Bell Icon Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-white hover:bg-slate-700 rounded-lg transition-colors"
+        className={navbar.bellButton}
       >
         <Bell className="h-6 w-6" />
 
         {/* Unread Badge */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+          <span className={colors.bgDestructive + ' absolute -top-1 -right-1 text-destructive-foreground text-xs font-bold rounded-full h-5 w-5 ' + flexRow.centerCenter}>
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -120,14 +124,14 @@ export const NotificationBell = () => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+        <div className={colors.bgCard + ' absolute right-0 mt-2 w-96 rounded-lg shadow-lg border border-border z-50'}>
           {/* Header */}
-          <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-            <h3 className="font-semibold text-gray-800">Notifications</h3>
+          <div className={flexRow.spaceBetween + ' px-4 py-3 border-b border-border'}>
+            <h3 className={typography.h3}>{"Notifications"}</h3>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                className={getButtonClasses('link', 'sm')}
               >
                 Mark all as read
               </button>
@@ -137,11 +141,11 @@ export const NotificationBell = () => {
           {/* Notification List */}
           <div className="max-h-96 overflow-y-auto">
             {loading ? (
-              <div className="px-4 py-8 flex justify-center items-center">
-                <Loader2 className="h-6 w-6 text-gray-400 animate-spin" />
+              <div className={flexCol.centerCenter + ' px-4 py-8'}>
+                <Loader2 className={colors.textMutedForeground + ' h-6 w-6 animate-spin'} />
               </div>
             ) : notifications.length === 0 ? (
-              <div className="px-4 py-8 text-center text-gray-500">
+              <div className={colors.textMutedForeground + ' px-4 py-8 text-center'}>
                 No new notifications
               </div>
             ) : (
@@ -149,22 +153,22 @@ export const NotificationBell = () => {
                 <div
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors"
+                  className="px-4 py-3 hover:bg-muted cursor-pointer border-b border-border transition-colors"
                 >
-                  <div className="flex justify-between items-start gap-2">
+                  <div className={flexRow.spaceBetween + ' gap-2'}>
                     <div className="flex-1">
-                      <p className="font-medium text-gray-800 text-sm">
+                      <p className={typography.body + ' font-medium'}>
                         {notification.title}
                       </p>
-                      <p className="text-gray-600 text-sm mt-1">
+                      <p className={colors.textMutedForeground + ' text-sm mt-1'}>
                         {notification.message}
                       </p>
                     </div>
                     {!notification.is_read && (
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-1 flex-shrink-0"></div>
+                      <div className={colors.bgPrimary + ' w-2 h-2 rounded-full mt-1 flex-shrink-0'}></div>
                     )}
                   </div>
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className={colors.textMutedForeground + ' text-xs mt-2'}>
                     {formatTimeAgo(notification.createdAt)}
                   </p>
                 </div>
