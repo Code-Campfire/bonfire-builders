@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import IssueCard from '../components/IssueCard';
-import IssueForm from '../Components/issueForm';
-import { issueAPI } from '../services/api';
-import { IssueFilters } from '../Components/IssueFilters';
-import { getButtonClasses } from '../styles/helpers';
-import { colors, alerts } from '../styles/colors';
-import { typography } from '../styles/typography';
-import { spacing, flexRow, flexCol } from '../styles/layout';
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import IssueCard from "../components/IssueCard";
+import IssueForm from "../Components/issueForm";
+import { issueAPI } from "../services/api";
+import { IssueFilters } from "../Components/IssueFilters";
+import { getButtonClasses } from "../styles/helpers";
+import { colors, alerts } from "../styles/colors";
+import { typography } from "../styles/typography";
+import { spacing, flexRow, flexCol } from "../styles/layout";
 
 const Issues = () => {
   const navigate = useNavigate();
@@ -27,9 +27,9 @@ const Issues = () => {
 
   // Check if URL indicates we should show the form
   useEffect(() => {
-    if (location.pathname === '/issues/new') {
+    if (location.pathname === "/issues/new") {
       setShowForm(true);
-    } else if (location.pathname === '/issues') {
+    } else if (location.pathname === "/issues") {
       setShowForm(false);
     }
   }, [location.pathname]);
@@ -64,10 +64,10 @@ const Issues = () => {
       // Add the new issue to the list
       setIssues([createdIssue, ...issues]);
       setShowForm(false);
-      navigate('/issues');
-      
+      navigate("/issues");
+
       // Show success message (you could use a toast notification library)
-      alert("Issue submitted successfully!");
+      toast.success("Issue reported successfully!");
     } catch (err) {
       console.error("Failed to submit issue:", err);
       setError("Failed to submit issue. Please try again.");
@@ -118,28 +118,28 @@ const Issues = () => {
   const handleToggleForm = () => {
     if (showForm) {
       setShowForm(false);
-      navigate('/issues');
+      navigate("/issues");
     } else {
       setShowForm(true);
-      navigate('/issues/new');
+      navigate("/issues/new");
     }
   };
 
   const handleCancelForm = () => {
     setShowForm(false);
     setError(null);
-    navigate('/issues');
+    navigate("/issues");
   };
 
   return (
     <div className={spacing.p6}>
-      <div className={flexRow.spaceBetween + ' mb-6'}>
+      <div className={flexRow.spaceBetween + " mb-6"}>
         <h1 className={typography.h1}>Maintenance Issues</h1>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className={alerts.error + ' mb-4 ' + flexRow.startStart}>
+        <div className={alerts.error + " mb-4 " + flexRow.startStart}>
           <svg
             className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0"
             fill="currentColor"
@@ -172,7 +172,7 @@ const Issues = () => {
           isSubmitting={submitting}
         />
       ) : loading ? (
-        <div className={flexCol.centerCenter + ' py-12'}>
+        <div className={flexCol.centerCenter + " py-12"}>
           <svg
             className="animate-spin h-12 w-12 text-primary mb-4"
             xmlns="http://www.w3.org/2000/svg"
@@ -196,9 +196,9 @@ const Issues = () => {
           <p className={colors.textMutedForeground}>Loading issues...</p>
         </div>
       ) : issues.length === 0 ? (
-        <div className={colors.bgMuted + ' text-center py-12 rounded-lg'}>
+        <div className={colors.bgMuted + " text-center py-12 rounded-lg"}>
           <svg
-            className={colors.textMutedForeground + ' mx-auto h-12 w-12 mb-4'}
+            className={colors.textMutedForeground + " mx-auto h-12 w-12 mb-4"}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -210,15 +210,13 @@ const Issues = () => {
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <h3 className={typography.h3 + ' mb-2'}>
-            No issues reported yet
-          </h3>
-          <p className={colors.textMutedForeground + ' mb-4'}>
+          <h3 className={typography.h3 + " mb-2"}>No issues reported yet</h3>
+          <p className={colors.textMutedForeground + " mb-4"}>
             Get started by reporting your first maintenance issue.
           </p>
           <button
             onClick={() => setShowForm(true)}
-            className={getButtonClasses('primary')}
+            className={getButtonClasses("primary")}
           >
             Report New Issue
           </button>
