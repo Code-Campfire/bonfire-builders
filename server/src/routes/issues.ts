@@ -4,6 +4,20 @@ import { AuthRequest, authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 
+// Helper function to check if user is authorized to access an issue
+function isUserAuthorizedForIssue(
+  userRole: string | undefined,
+  userId: number | undefined,
+  userComplexId: number | undefined,
+  issue: { user_id: number; complex_id: number }
+): boolean {
+  return (
+    userRole === 'ADMIN' ||
+    (userRole === 'TENANT' && issue.user_id === userId) ||
+    (userRole === 'LANDLORD' && issue.complex_id === userComplexId)
+  );
+}
+
 // GET all issues (requires authentication)
 router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
@@ -79,12 +93,7 @@ router.get('/:id/messages', authenticateToken, async (req: AuthRequest, res: Res
     }
 
     // Authorization check
-    const isAuthorized = 
-      req.user?.role === 'ADMIN' ||
-      (req.user?.role === 'TENANT' && issue.user_id === req.user.id) ||
-      (req.user?.role === 'LANDLORD' && issue.complex_id === req.user.complex_id);
-
-    if (!isAuthorized) {
+    if (!isUserAuthorizedForIssue(req.user?.role, req.user?.id, req.user?.complex_id, issue)) {
       return res.status(403).json({ error: 'You do not have permission to view these messages' });
     }
 
@@ -144,12 +153,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     }
 
     // Authorization check based on role
-    const isAuthorized = 
-      req.user?.role === 'ADMIN' || // Admins can see everything
-      (req.user?.role === 'TENANT' && issue.user_id === req.user.id) || // Tenant owns it
-      (req.user?.role === 'LANDLORD' && issue.complex_id === req.user.complex_id); // Landlord's complex
-
-    if (!isAuthorized) {
+    if (!isUserAuthorizedForIssue(req.user?.role, req.user?.id, req.user?.complex_id, issue)) {
       return res.status(403).json({ error: 'You do not have permission to view this issue' });
     }
 
