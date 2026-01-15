@@ -100,6 +100,17 @@ export const issueAPI = {
       throw error;
     }
   },
+
+  // Confirm or dispute a resolved issue (tenant only)
+  confirmIssue: async (id, confirmed, notes = null) => {
+    try {
+      const response = await api.post(`/issues/${id}/confirm`, { confirmed, notes });
+      return response.data;
+    } catch (error) {
+      console.error('Error confirming issue:', error);
+      throw error;
+    }
+  },
 };
 
 // User API calls

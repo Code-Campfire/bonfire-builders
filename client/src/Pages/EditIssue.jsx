@@ -4,10 +4,10 @@ import { ArrowLeft } from 'lucide-react';
 import { issueAPI } from '../services/api';
 import { formatCategory } from '../utils/categoryUtils';
 import { getButtonClasses, getInputClasses, getSelectClasses, getTextareaClasses } from '../styles/helpers';
-import { colors } from '../styles/colors';
+import { colors, loadingStyles } from '../styles/colors';
 import { labelBase } from '../styles/forms';
 import { typography } from '../styles/typography';
-import { spacing, flexRow, flexCol } from '../styles/layout';
+import { spacing, flexRow, flexCol, layout } from '../styles/layout';
 
 const CATEGORIES = [
   'PLUMBING', 'ELECTRICAL', 'HVAC', 'STRUCTURAL', 'APPLIANCE',
@@ -84,7 +84,7 @@ export default function EditIssue() {
   if (loading) {
     return (
       <div className={colors.bgBackground + ' min-h-screen ' + flexCol.centerCenter}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className={loadingStyles.spinnerBorder}></div>
       </div>
     );
   }
@@ -92,7 +92,7 @@ export default function EditIssue() {
   if (error) {
     return (
       <div className={colors.bgBackground + ' min-h-screen ' + flexCol.centerCenter}>
-        <div className="text-center">
+        <div className={flexCol.centerCenter}>
           <p className={colors.textDestructive + ' mb-4'}>{error}</p>
           <button
             onClick={() => navigate('/issues')}
@@ -107,22 +107,22 @@ export default function EditIssue() {
 
   return (
     <div className={colors.bgBackground + ' min-h-screen ' + spacing.p6}>
-      <div className="max-w-2xl mx-auto">
+      <div className={layout.contentContainerLg}>
         {/* Header */}
-        <div className="mb-6">
+        <div className={spacing.section}>
           <button
             onClick={() => navigate(`/issues/${id}`)}
             className={getButtonClasses('link') + ' mb-4'}
           >
             <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium">Back to Maintenance Request</span>
+            <span className={typography.fontMedium}>Back to Maintenance Request</span>
           </button>
           <h1 className={typography.h1 + ' text-center'}>Edit Issue</h1>
         </div>
 
         {/* Form */}
         <div className={colors.bgCard + ' rounded-lg shadow-md ' + spacing.p6}>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className={spacing.stackLg}>
             {/* Title */}
             <div>
               <label htmlFor="title" className={labelBase}>

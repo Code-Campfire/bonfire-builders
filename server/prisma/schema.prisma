@@ -56,6 +56,9 @@ model Issue {
   acknowledged_date DateTime?
   resolved_date DateTime?
   closed_date DateTime?
+  tenant_confirmed Boolean?
+  tenant_confirmation_date DateTime?
+  tenant_confirmation_notes String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
@@ -170,6 +173,8 @@ enum NotificationType {
   ISSUE_ACKNOWLEDGED
   ISSUE_RESOLVED
   ISSUE_CLOSED
+  ISSUE_CONFIRMED
+  ISSUE_DISPUTED
   MESSAGE_RECEIVED
   ISSUE_PRIORITY_CHANGED
   SYSTEM_ANNOUNCEMENT

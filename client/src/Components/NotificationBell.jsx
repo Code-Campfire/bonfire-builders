@@ -4,9 +4,10 @@ import { notificationAPI } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { formatTimeAgo } from "../utils/timeUtils";
 import { getButtonClasses } from "../styles/helpers";
-import { colors, navbar } from "../styles/colors";
+import { colors, navbar, notificationStyles } from "../styles/colors";
 import { typography } from "../styles/typography";
 import { flexRow, flexCol } from "../styles/layout";
+import { useSocket } from "../context/SocketContext";
 
 export const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +16,7 @@ export const NotificationBell = () => {
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const socket = useSocket();
 
   // Fetch unread count on mount and periodically
   useEffect(() => {
@@ -22,6 +24,24 @@ export const NotificationBell = () => {
     const interval = setInterval(fetchUnreadCount, 30000); // Poll every 30 seconds
     return () => clearInterval(interval);
   }, []);
+
+  // Listen for real-time notifications
+  useEffect(() => {
+    if (socket) {
+      socket.on('new-notification', (notification) => {
+        console.log('Received new notification:', notification);
+        setUnreadCount((prev) => prev + 1);
+        // If dropdown is open, add the new notification to the list
+        if (isOpen) {
+          setNotifications((prev) => [notification, ...prev]);
+        }
+      });
+
+      return () => {
+        socket.off('new-notification');
+      };
+    }
+  }, [socket, isOpen]);
 
   // Fetch notifications when dropdown opens
   useEffect(() => {
@@ -106,7 +126,7 @@ export const NotificationBell = () => {
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className={notificationStyles.container} ref={dropdownRef}>
       {/* Bell Icon Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -124,7 +144,7 @@ export const NotificationBell = () => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className={colors.bgCard + ' absolute right-0 mt-2 w-96 rounded-lg shadow-lg border border-border z-50'}>
+        <div className={colors.bgCard + ' ' + notificationStyles.dropdown}>
           {/* Header */}
           <div className={flexRow.spaceBetween + ' px-4 py-3 border-b border-border'}>
             <h3 className={typography.h3}>{"Notifications"}</h3>
@@ -139,7 +159,7 @@ export const NotificationBell = () => {
           </div>
 
           {/* Notification List */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className={notificationStyles.listContainer}>
             {loading ? (
               <div className={flexCol.centerCenter + ' px-4 py-8'}>
                 <Loader2 className={colors.textMutedForeground + ' h-6 w-6 animate-spin'} />
@@ -153,10 +173,10 @@ export const NotificationBell = () => {
                 <div
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className="px-4 py-3 hover:bg-muted cursor-pointer border-b border-border transition-colors"
+                  className={notificationStyles.item}
                 >
                   <div className={flexRow.spaceBetween + ' gap-2'}>
-                    <div className="flex-1">
+                    <div className={notificationStyles.itemContent}>
                       <p className={typography.body + ' font-medium'}>
                         {notification.title}
                       </p>

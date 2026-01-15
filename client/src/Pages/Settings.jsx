@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/context";
 import { userAPI } from "../services/api";
 import { getButtonClasses } from "../styles/helpers";
-import { colors } from "../styles/colors";
+import { colors, loadingStyles } from "../styles/colors";
 import { toggleSwitch } from "../styles/buttons";
 import { typography } from "../styles/typography";
-import { spacing, flexRow } from "../styles/layout";
+import { spacing, flexRow, flexCol } from "../styles/layout";
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -74,12 +74,12 @@ function Settings() {
       >
         <h2 className={typography.h2 + " mb-6"}>Notifications</h2>
 
-        <div className="space-y-4">
+        <div className={spacing.stack}>
           <div
             className={flexRow.spaceBetween + " py-3 border-b border-border"}
           >
-            <div className="flex-1">
-              <h3 className={typography.body + " font-medium"}>
+            <div className={flexCol.startStart}>
+              <h3 className={typography.body + " " + typography.fontMedium}>
                 Email notifications for landlord messages
               </h3>
               <p className={colors.textMutedForeground + " text-sm mt-1"}>
@@ -87,8 +87,8 @@ function Settings() {
               </p>
             </div>
             {loading ? (
-              <div className="w-11 h-6 flex items-center justify-center">
-                <Loader2Icon className="animate-spin h-5 w-5 text-muted-foreground" />
+              <div className={flexRow.centerCenter + " w-11 h-6"}>
+                <Loader2Icon className={loadingStyles.spinnerSmall} />
               </div>
             ) : (
               <button
@@ -113,7 +113,7 @@ function Settings() {
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end h-10">
+        <div className={spacing.mt6 + " " + flexRow.endCenter + " h-10"}>
           <button
             onClick={handleSaveChanges}
             disabled={saving}

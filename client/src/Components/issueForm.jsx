@@ -10,6 +10,7 @@ import {
   spacing 
 } from '../styles';
 import { sectionBg } from '../styles/colors';
+import { flexRow, spacing as layoutSpacing } from '../styles/layout';
 
 const IssueForm = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -198,7 +199,7 @@ const IssueForm = ({ onSubmit, onCancel }) => {
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-3 pt-4">
+        <div className={flexRow.startCenter + ' ' + layoutSpacing.gap3 + ' ' + layoutSpacing.pt4}>
           <button
             type="submit"
             className={getButtonClasses('primary', 'md', 'flex-1')}
