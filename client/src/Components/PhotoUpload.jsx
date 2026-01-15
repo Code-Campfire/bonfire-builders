@@ -3,6 +3,7 @@ import { photoAPI } from "../services/api";
 import { getButtonClasses } from "../styles/helpers";
 import { colors, alerts } from "../styles/colors";
 import { typography } from "../styles/typography";
+import { spacing, flexRow } from "../styles/layout";
 
 export const PhotoUpload = ({ issueId, onUploadComplete }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -106,7 +107,7 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
   };
 
   return (
-    <div className="mt-6">
+    <div className={spacing.mt6}>
       {/* File Input (hidden) */}
       <input
         type="file"
@@ -124,7 +125,7 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
           <h3 className={typography.label + ' mb-2'}>
             Selected Files ({selectedFiles.length})
           </h3>
-          <div className="space-y-2">
+          <div className={spacing.stackSm}>
             {selectedFiles.map((file, index) => (
               <div key={index} className={typography.smallMuted}>
                 {file.name} ({(file.size / 1024).toFixed(1)} KB)
@@ -142,7 +143,7 @@ export const PhotoUpload = ({ issueId, onUploadComplete }) => {
       )}
 
       {/* Action Buttons */}
-      <div className="flex gap-3 justify-center">
+      <div className={flexRow.centerCenter + ' ' + spacing.gap3}>
         <label
           htmlFor="photo-upload"
           className={getButtonClasses('primary') + ' cursor-pointer'}

@@ -9,9 +9,9 @@ import { getDaysAgo } from "@/utils/dateUtils";
 import { issueAPI, photoAPI } from "../services/api";
 import { toast } from "sonner";
 import { getButtonClasses, getInputClasses, getSelectClasses, getTextareaClasses } from "../styles/helpers";
-import { colors, sections, iconColors } from "../styles/colors";
+import { colors, sections, iconColors, loadingStyles } from "../styles/colors";
 import { buttonVariants } from "../styles/buttons";
-import { spacing, flexRow, flexCol, timeline } from "../styles/layout";
+import { spacing, flexRow, flexCol, timeline, layout } from "../styles/layout";
 import { typography } from "../styles/typography";
 import { selectBase, textareaBase } from "../styles/forms";
 import {
@@ -32,6 +32,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { Messages } from "../Components/messaging/Messages";
+import { TenantConfirmation } from "../Components/TenantConfirmation";
 import { useAuth } from "../context/context";
 import { PhotoCarousel } from "../Components/PhotoCarousel";
 
@@ -255,10 +256,10 @@ const IssueDetail = () => {
   if (loading) {
     return (
       <div className={colors.bgBackground + ' min-h-screen ' + spacing.p6}>
-        <div className="max-w-5xl mx-auto">
+        <div className={layout.contentContainer}>
           <div className={flexCol.centerCenter + ' py-12'}>
             <svg
-              className="animate-spin h-12 w-12 text-primary"
+              className={loadingStyles.spinner}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -286,7 +287,7 @@ const IssueDetail = () => {
   if (error || !issue) {
     return (
       <div className={colors.bgBackground + ' min-h-screen ' + spacing.p6}>
-        <div className="max-w-5xl mx-auto">
+        <div className={layout.contentContainer}>
           <button
             onClick={handleBack}
             className={getButtonClasses('link') + ' mb-6'}
@@ -310,7 +311,7 @@ const IssueDetail = () => {
 
   return (
     <div className={colors.bgBackground + ' min-h-screen ' + spacing.p6}>
-      <div className="max-w-5xl mx-auto">
+      <div className={layout.contentContainer}>
         {/* Back Button */}
         <div className={flexRow.spaceBetween + ' mb-6'}>
           <button
@@ -475,6 +476,14 @@ const IssueDetail = () => {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Tenant Confirmation Card - shown to tenants when issue is resolved */}
+        {user?.role === "TENANT" && (
+          <TenantConfirmation 
+            issue={issue} 
+            onConfirmation={(updatedIssue) => setIssue(updatedIssue)} 
+          />
         )}
 
         {/* Timeline Card */}

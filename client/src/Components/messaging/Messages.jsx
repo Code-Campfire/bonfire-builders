@@ -4,6 +4,8 @@ import { issueAPI } from '../../services/api';
 import { MessageSquare, User } from "lucide-react"
 import { useAuth } from '../../context/context';
 import { getButtonClasses, textareaBase, typography } from '../../styles';
+import { messageCard } from '../../styles/cards';
+import { iconColors } from '../../styles/colors';
 
 export const Messages = ({ issue, onMessageUpdate }) => {
   const [messages, setMessages] = useState(issue.messages || []);
@@ -71,15 +73,15 @@ export const Messages = ({ issue, onMessageUpdate }) => {
           {messages.map((message) => (
             <div
               key={message.id}
-              className="p-4 bg-muted rounded-lg border border-border"
+              className={messageCard.container}
             >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
+              <div className={messageCard.header}>
+                <div className={messageCard.senderInfo}>
+                  <User className={iconColors.muted} />
                   <span className="font-medium">
                     {message.sender?.first_name} {message.sender?.last_name}
                   </span>
-                  <span className="px-2 py-0.5 bg-secondary rounded text-xs">
+                  <span className={messageCard.roleBadge}>
                     {message.sender?.role}
                   </span>
                 </div>
@@ -87,7 +89,7 @@ export const Messages = ({ issue, onMessageUpdate }) => {
                   {new Date(message.sent_at).toLocaleString()}
                 </span>
               </div>
-              <p className="text-foreground whitespace-pre-wrap">
+              <p className={messageCard.body}>
                 {message.message_text}
               </p>
             </div>

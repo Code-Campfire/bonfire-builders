@@ -4,7 +4,7 @@ import { notificationAPI } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { formatTimeAgo } from "../utils/timeUtils";
 import { getButtonClasses } from "../styles/helpers";
-import { colors, navbar } from "../styles/colors";
+import { colors, navbar, notificationStyles } from "../styles/colors";
 import { typography } from "../styles/typography";
 import { flexRow, flexCol } from "../styles/layout";
 
@@ -106,7 +106,7 @@ export const NotificationBell = () => {
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className={notificationStyles.container} ref={dropdownRef}>
       {/* Bell Icon Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -124,7 +124,7 @@ export const NotificationBell = () => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className={colors.bgCard + ' absolute right-0 mt-2 w-96 rounded-lg shadow-lg border border-border z-50'}>
+        <div className={colors.bgCard + ' ' + notificationStyles.dropdown}>
           {/* Header */}
           <div className={flexRow.spaceBetween + ' px-4 py-3 border-b border-border'}>
             <h3 className={typography.h3}>{"Notifications"}</h3>
@@ -139,7 +139,7 @@ export const NotificationBell = () => {
           </div>
 
           {/* Notification List */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className={notificationStyles.listContainer}>
             {loading ? (
               <div className={flexCol.centerCenter + ' px-4 py-8'}>
                 <Loader2 className={colors.textMutedForeground + ' h-6 w-6 animate-spin'} />
@@ -153,10 +153,10 @@ export const NotificationBell = () => {
                 <div
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className="px-4 py-3 hover:bg-muted cursor-pointer border-b border-border transition-colors"
+                  className={notificationStyles.item}
                 >
                   <div className={flexRow.spaceBetween + ' gap-2'}>
-                    <div className="flex-1">
+                    <div className={notificationStyles.itemContent}>
                       <p className={typography.body + ' font-medium'}>
                         {notification.title}
                       </p>

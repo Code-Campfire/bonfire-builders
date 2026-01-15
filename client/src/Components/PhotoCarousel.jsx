@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/carousel";
 import { X } from "lucide-react";
 import { typography } from "../styles/typography";
-import { sectionBg } from "../styles/colors";
+import { sectionBg, overlay } from "../styles/colors";
 
 export function PhotoCarousel({ photos, initialIndex = 0, isOpen, onClose }) {
   const [api, setApi] = useState();
@@ -42,11 +42,11 @@ export function PhotoCarousel({ photos, initialIndex = 0, isOpen, onClose }) {
   if (!isOpen || !photos || photos.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="relative w-full max-w-4xl max-h-[90vh] bg-black bg-opacity-90 overflow-hidden rounded-lg flex flex-col">
+    <div className={overlay.backdrop}>
+      <div className={overlay.container}>
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-2 text-white transition-colors"
+          className={overlay.closeButton}
         >
           <X className="h-6 w-6" />
         </button>
@@ -71,7 +71,7 @@ export function PhotoCarousel({ photos, initialIndex = 0, isOpen, onClose }) {
                       />
                       {/* Caption overlay on the photo */}
                       {photo.caption?.trim() && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 p-4 rounded-b-lg">
+                        <div className={overlay.captionOverlay}>
                           <p className={typography.small + ' text-white break-words'}>
                             {photo.caption}
                           </p>
@@ -79,7 +79,7 @@ export function PhotoCarousel({ photos, initialIndex = 0, isOpen, onClose }) {
                       )}
                       {/* Timestamp overlay in top-right corner */}
                       {photo.uploaded_at && (
-                        <div className="absolute top-2 right-2 bg-black bg-opacity-60 px-3 py-1 rounded-md">
+                        <div className={overlay.timestampOverlay}>
                           <p className={typography.xsmall + ' text-slate-300'}>
                             {new Date(photo.uploaded_at).toLocaleString([], {
                               year: "numeric",

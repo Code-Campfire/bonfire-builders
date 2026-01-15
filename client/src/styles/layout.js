@@ -22,6 +22,7 @@ export const layout = {
 // Flex row utilities
 export const flexRow = {
   base: 'flex flex-row',
+  start: 'flex flex-row',
   centerCenter: 'flex items-center justify-center',
   spaceBetween: 'flex items-center justify-between',
   startCenter: 'flex items-center',
@@ -63,4 +64,25 @@ export const spacing = {
   gap2: 'gap-2',
   gap3: 'gap-3',
   gap4: 'gap-4',
+  pt4: 'pt-4',
+  mx2: 'mx-2',
+  mr2: 'mr-2',
+  m2: 'm-2',
+  mb4: 'mb-4',
+  mt6: 'mt-6',
+};
+
+// Grid utilities
+export const grid = {
+  cols2: 'grid grid-cols-1 md:grid-cols-2 gap-4',
+  cols3: 'grid grid-cols-1 md:grid-cols-3 gap-4',
+  photosGrid: 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4',
+  issueCardsWrap: 'flex flex-row flex-wrap gap-4',
+};
+
+// Flex wrap utilities
+export const flexWrap = {
+  row: 'flex flex-row flex-wrap gap-4',
+  rowGap2: 'flex flex-row flex-wrap gap-2',
+  rowGap3: 'flex flex-row flex-wrap gap-3',
 };

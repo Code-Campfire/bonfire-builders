@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { complexAPI, userAPI } from "../../services/api";
 import { EyeOff, Eye } from "lucide-react";
 import { getButtonClasses, getInputClasses, labelBase, errorText, cardVariants, cardPadding, typography } from "../../styles";
+import { flexRow, spacing } from "../../styles/layout";
 
 export const RegistrationForm = () => {
     const navigate = useNavigate()
@@ -199,7 +200,7 @@ export const RegistrationForm = () => {
                 )}
                 <br />
                 <label htmlFor="password" className={labelBase}>Password: </label>
-                <div className="flex flex-row">
+                <div className={flexRow.start}>
                 <input
                     type={showPassword ? "text" : "password"}
                     value={userFormData.password_hash}
@@ -208,7 +209,7 @@ export const RegistrationForm = () => {
                     onChange={handleUserChange}
                     className={getInputClasses(!!errors.password_hash)}
                 />
-                <button type="button" className="m-2" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff /> : <Eye />}</button>
+                <button type="button" className={spacing.m2} onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff /> : <Eye />}</button>
                 </div>
                 {errors.password_hash && (
                     <p className={errorText}>{errors.password_hash}</p>

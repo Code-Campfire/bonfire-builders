@@ -5,9 +5,10 @@ import IssueForm from "../Components/issueForm";
 import { issueAPI } from "../services/api";
 import { IssueFilters } from "../Components/IssueFilters";
 import { getButtonClasses } from "../styles/helpers";
-import { colors, alerts } from "../styles/colors";
+import { colors, alerts, loadingStyles } from "../styles/colors";
 import { typography } from "../styles/typography";
-import { spacing, flexRow, flexCol } from "../styles/layout";
+import { spacing, flexRow, flexCol, flexWrap } from "../styles/layout";
+import { toast } from "sonner";
 
 const Issues = () => {
   const navigate = useNavigate();
@@ -174,7 +175,7 @@ const Issues = () => {
       ) : loading ? (
         <div className={flexCol.centerCenter + " py-12"}>
           <svg
-            className="animate-spin h-12 w-12 text-primary mb-4"
+            className={loadingStyles.spinner}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -227,7 +228,7 @@ const Issues = () => {
             filters={filters}
             onFilterChange={handleFiltersChange}
           />
-          <div className="flex flex-row flex-wrap gap-4">
+          <div className={flexWrap.row}>
             {filteredIssues.map((issue) => (
               <IssueCard key={issue.id} issue={issue} />
             ))}
