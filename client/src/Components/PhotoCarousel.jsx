@@ -6,14 +6,14 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
+} from "@/Components/ui/carousel";
 import { X } from "lucide-react";
 import { typography } from "../styles/typography";
 import { sectionBg } from "../styles/colors";
 
 export function PhotoCarousel({ photos, initialIndex = 0, isOpen, onClose }) {
   const [api, setApi] = useState();
-  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [currentIndex, setCurrentIndex] = useState(initialIndex); 
 
   useEffect(() => {
     if (api && initialIndex >= 0) {

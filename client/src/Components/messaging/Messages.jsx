@@ -90,6 +90,9 @@ export const Messages = ({ issue, onMessageUpdate }) => {
               <p className="text-foreground whitespace-pre-wrap">
                 {message.message_text}
               </p>
+              <span className="px-2 py-0.5 bg-secondary rounded text-xs">
+                <p className="text-right">{message.is_read === true ? "Read" : "Sent"}</p>
+              </span>
             </div>
           ))}
         </div>
