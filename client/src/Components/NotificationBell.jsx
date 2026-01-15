@@ -7,6 +7,7 @@ import { getButtonClasses } from "../styles/helpers";
 import { colors, navbar, notificationStyles } from "../styles/colors";
 import { typography } from "../styles/typography";
 import { flexRow, flexCol } from "../styles/layout";
+import { useSocket } from "../context/SocketContext";
 
 export const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +16,7 @@ export const NotificationBell = () => {
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const socket = useSocket();
 
   // Fetch unread count on mount and periodically
   useEffect(() => {
@@ -22,6 +24,24 @@ export const NotificationBell = () => {
     const interval = setInterval(fetchUnreadCount, 30000); // Poll every 30 seconds
     return () => clearInterval(interval);
   }, []);
+
+  // Listen for real-time notifications
+  useEffect(() => {
+    if (socket) {
+      socket.on('new-notification', (notification) => {
+        console.log('Received new notification:', notification);
+        setUnreadCount((prev) => prev + 1);
+        // If dropdown is open, add the new notification to the list
+        if (isOpen) {
+          setNotifications((prev) => [notification, ...prev]);
+        }
+      });
+
+      return () => {
+        socket.off('new-notification');
+      };
+    }
+  }, [socket, isOpen]);
 
   // Fetch notifications when dropdown opens
   useEffect(() => {

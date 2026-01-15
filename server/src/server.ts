@@ -30,7 +30,10 @@ io.use(async (socket, next) => {
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.data.user.userId);
+  console.log('User connected:', socket.data.user.id);
+
+  // Automatically join user's personal notification room
+  socket.join(`user-${socket.data.user.id}`);
 
   // Join issue-specific room
   socket.on('join-issue', (issueId) => {
@@ -44,7 +47,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.data.user.userId);
+    console.log('User disconnected:', socket.data.user.id);
   });
 });
 
