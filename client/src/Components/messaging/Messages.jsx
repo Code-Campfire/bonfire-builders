@@ -36,6 +36,29 @@ export const Messages = ({ issue, onMessageUpdate }) => {
     }
   }, [socket, issue.id, onMessageUpdate]);
 
+  useEffect(() => {
+    const target = document.querySelector("#messages-list");
+
+    const options = {
+    root: null, // Element used as the viewport. Checks target visibility
+    rootMargin: "100px", // Grow or shrink element's bounding box, affect's intersection size
+    scrollMargin:  "0px", // Additional margin to be used in scrolling containers
+    threshold: 1.0 // At which percentage the callback ought to be called. 1.0 = 100%
+  };
+
+  function callback(entries){
+    entries.forEach(entry => {
+        if(entry.target === target){
+          console.log("Messages Section observed! ")
+        }
+    });
+  }
+
+  const intersectionObserver = new IntersectionObserver(callback, options)
+  intersectionObserver.observe(target)
+
+  }, [])
+
   const handleSendMessage = async () => {
     if (!newMessage.trim() || isSending) return;
 
