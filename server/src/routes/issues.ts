@@ -309,14 +309,24 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     // Set date fields based on status transitions
     // When moving to a status, set its date if not already set
     // When moving back to an earlier status, clear the dates for later statuses
-    if (status === 'PENDING') {
-      // Moving back to PENDING clears all progress dates
+    if (status === 'OPEN') {
+      // Moving back to OPEN clears all progress dates
       updateData.acknowledged_date = null;
+      updateData.in_progress_date = null;
       updateData.resolved_date = null;
       updateData.closed_date = null;
     } else if (status === 'IN_PROGRESS') {
+      // Automatically set acknowledged_date if not set (first time acknowledging)
       if (!currentIssue.acknowledged_date) {
         updateData.acknowledged_date = new Date();
+      }
+      // Automatically set in_progress_date when work starts
+      const currentIssueWithInProgress = await prisma.issue.findUnique({
+        where: { id: issueId },
+        select: { in_progress_date: true }
+      });
+      if (!currentIssueWithInProgress?.in_progress_date) {
+        updateData.in_progress_date = new Date();
       }
       // Clear resolved and closed dates (moving back from later status)
       updateData.resolved_date = null;
@@ -327,6 +337,8 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
       }
       // Clear closed_date (moving back from CLOSED)
       updateData.closed_date = null;
+      // NOTE: We do NOT clear tenant_confirmed here - it preserves first response for metrics
+      // Tenant can still respond again via the confirmation endpoint
     } else if (status === 'CLOSED') {
       if (!currentIssue.closed_date) {
         updateData.closed_date = new Date();
@@ -451,6 +463,148 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
     res.status(204).send();
   } catch (error: any) {
     console.error('Error deleting issue:', error);
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Issue not found' });
+    }
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST tenant confirmation/dispute of a resolved issue
+router.post('/:id/confirm', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const issueId = Number(req.params.id);
+    const userId = req.user?.id;
+    const { confirmed, notes } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    // Only tenants can confirm repairs
+    if (req.user?.role !== 'TENANT') {
+      return res.status(403).json({ 
+        error: 'Only tenants can confirm or dispute repairs' 
+      });
+    }
+
+    // Verify issue exists
+    const existingIssue = await prisma.issue.findUnique({
+      where: { id: issueId },
+      include: {
+        complex: true
+      }
+    });
+
+    if (!existingIssue) {
+      return res.status(404).json({ error: 'Issue not found' });
+    }
+
+    // Only the tenant who created the issue can confirm
+    if (existingIssue.user_id !== userId) {
+      return res.status(403).json({ 
+        error: 'You can only confirm repairs for issues you created' 
+      });
+    }
+
+    // Issue must be in RESOLVED status to be confirmed
+    if (existingIssue.status !== 'RESOLVED') {
+      return res.status(400).json({ 
+        error: 'Only resolved issues can be confirmed or disputed' 
+      });
+    }
+
+    // Validate confirmed is a boolean
+    if (typeof confirmed !== 'boolean') {
+      return res.status(400).json({ 
+        error: 'The "confirmed" field must be true or false',
+        required: ['confirmed']
+      });
+    }
+
+    // Update the issue with tenant confirmation
+    const updatedIssue = await prisma.issue.update({
+      where: { id: issueId },
+      data: {
+        tenant_confirmed: confirmed,
+        tenant_confirmation_date: new Date(),
+        tenant_confirmation_notes: notes?.trim() || null,
+        // If tenant confirms, automatically close the issue
+        ...(confirmed && { 
+          status: 'CLOSED',
+          closed_date: new Date()
+        }),
+        // If tenant disputes, move back to IN_PROGRESS
+        ...(!confirmed && {
+          status: 'IN_PROGRESS',
+          resolved_date: null
+        })
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            email: true,
+            apartment_number: true,
+            building_name: true,
+            phone: true
+          }
+        },
+        complex: true,
+        photos: true,
+        messages: {
+          include: {
+            sender: {
+              select: {
+                id: true,
+                first_name: true,
+                last_name: true,
+                role: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Notify landlords about the confirmation/dispute
+    const landlords = await prisma.user.findMany({
+      where: {
+        complex_id: existingIssue.complex_id,
+        role: 'LANDLORD'
+      }
+    });
+
+    const notificationType = confirmed ? 'ISSUE_CONFIRMED' : 'ISSUE_DISPUTED';
+    const notificationTitle = confirmed 
+      ? 'Repair confirmed by tenant' 
+      : 'Repair disputed by tenant';
+    const notificationMessage = confirmed
+      ? `${req.user?.first_name} ${req.user?.last_name} confirmed the repair for "${existingIssue.title}" is complete`
+      : `${req.user?.first_name} ${req.user?.last_name} disputed the repair for "${existingIssue.title}"${notes ? `: "${notes.trim()}"` : ''}`;
+
+    for (const landlord of landlords) {
+      await prisma.notification.create({
+        data: {
+          user_id: landlord.id,
+          type: notificationType,
+          title: notificationTitle,
+          message: notificationMessage,
+          issue_id: issueId
+        }
+      });
+    }
+
+    res.json({
+      message: confirmed 
+        ? 'Repair confirmed and issue closed' 
+        : 'Repair disputed - issue reopened for further work',
+      issue: updatedIssue
+    });
+  } catch (error: any) {
+    console.error('Error confirming issue:', error);
     if (error.code === 'P2025') {
       return res.status(404).json({ error: 'Issue not found' });
     }

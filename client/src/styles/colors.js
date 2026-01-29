@@ -84,3 +84,64 @@ export const sections = {
     info: 'bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-md',
   },
 };
+
+// Status badge colors (exact colors from StatusBadge.jsx)
+export const statusColors = {
+  OPEN: 'bg-blue-100 text-blue-800 border-blue-200',
+  IN_PROGRESS: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  RESOLVED: 'bg-green-100 text-green-800 border-green-200',
+  CLOSED: 'bg-gray-100 text-gray-800 border-gray-200',
+  default: 'bg-gray-100 text-gray-800 border-gray-200',
+};
+
+// Priority badge colors (exact colors from PriorityBadge.jsx)
+export const priorityColors = {
+  LOW: 'bg-gray-100 text-gray-800 border-gray-300',
+  MEDIUM: 'bg-blue-100 text-blue-800 border-blue-300',
+  HIGH: 'bg-orange-100 text-orange-800 border-orange-300',
+  URGENT: 'bg-red-100 text-red-800 border-red-300',
+  default: 'bg-gray-100 text-gray-800 border-gray-300',
+};
+
+// Confirmation/status icon colors
+export const confirmationColors = {
+  confirmed: 'text-green-500',
+  disputed: 'text-red-500',
+  pending: 'text-amber-500',
+};
+
+// Confirmation button overrides
+export const confirmationButtons = {
+  confirm: 'bg-green-600 hover:bg-green-500',
+  dispute: 'bg-red-600 text-white hover:bg-red-500',
+};
+
+// Confirmation card styling
+export const confirmationCard = {
+  pending: 'border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800',
+};
+
+// Carousel/modal overlay styles
+export const overlay = {
+  backdrop: 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4',
+  container: 'relative w-full max-w-4xl max-h-[90vh] bg-black bg-opacity-90 overflow-hidden rounded-lg flex flex-col',
+  closeButton: 'absolute top-4 right-4 z-10 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-2 text-white transition-colors',
+  captionOverlay: 'absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 p-4 rounded-b-lg',
+  timestampOverlay: 'absolute top-2 right-2 bg-black bg-opacity-60 px-3 py-1 rounded-md',
+};
+
+// Loading spinner
+export const loadingStyles = {
+  spinner: 'animate-spin h-12 w-12 text-primary mb-4',
+  spinnerSmall: 'animate-spin h-6 w-6 text-muted-foreground',
+  spinnerBorder: 'animate-spin rounded-full h-12 w-12 border-b-2 border-primary',
+};
+
+// Notification dropdown styles
+export const notificationStyles = {
+  container: 'relative',
+  dropdown: 'absolute right-0 mt-2 w-96 rounded-lg shadow-lg border border-border z-50',
+  listContainer: 'max-h-96 overflow-y-auto',
+  item: 'px-4 py-3 hover:bg-muted cursor-pointer border-b border-border transition-colors',
+  itemContent: 'flex-1',
+};

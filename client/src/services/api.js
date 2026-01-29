@@ -100,6 +100,17 @@ export const issueAPI = {
       throw error;
     }
   },
+
+  // Confirm or dispute a resolved issue (tenant only)
+  confirmIssue: async (id, confirmed, notes = null) => {
+    try {
+      const response = await api.post(`/issues/${id}/confirm`, { confirmed, notes });
+      return response.data;
+    } catch (error) {
+      console.error('Error confirming issue:', error);
+      throw error;
+    }
+  },
 };
 
 // User API calls
@@ -203,6 +214,21 @@ export const photoAPI = {
       throw error
     }
   }
+};
+
+// Metrics API calls
+export const metricsAPI = {
+  // Get metrics for the authenticated user (role-based view)
+  getMetrics: async (daysBack = null) => {
+    try {
+      const params = daysBack ? { daysBack } : {};
+      const response = await api.get("/metrics", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching metrics:", error);
+      throw error;
+    }
+  },
 };
 
 // Notification API calls

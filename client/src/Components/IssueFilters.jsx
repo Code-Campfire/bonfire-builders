@@ -1,8 +1,9 @@
 import { getSelectClasses, getInputClasses } from "../styles/helpers";
+import { flexRow, spacing } from "../styles/layout";
 
 export const IssueFilters = ({ filters, onFilterChange }) => {
   return (
-    <div className="flex gap-4 mb-4">
+    <div className={flexRow.startCenter + ' ' + spacing.gap4 + ' ' + spacing.mb4}>
       {/* Status filter */}
       <select
         value={filters.status}
@@ -52,14 +53,14 @@ export const IssueFilters = ({ filters, onFilterChange }) => {
       </select>
 
       {/* Date filter */}
-      <div className="flex items-center">
+      <div className={flexRow.startCenter}>
         <input
           type="date"
           value={filters.startDate}
           onChange={(e) => onFilterChange("startDate", e.target.value)}
-          className={getInputClasses() + ' mr-2'}
+          className={getInputClasses() + ' ' + spacing.mr2}
         />
-        <span className="mx-2">to</span>
+        <span className={spacing.mx2}>to</span>
         <input
           type="date"
           value={filters.endDate}

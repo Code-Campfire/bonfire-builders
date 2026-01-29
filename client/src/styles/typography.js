@@ -18,6 +18,11 @@ export const typography = {
   
   label: 'text-sm font-medium text-foreground',
   caption: 'text-xs text-muted-foreground',
+  
+  // Font weights
+  fontMedium: 'font-medium',
+  fontBold: 'font-bold',
+  fontSemibold: 'font-semibold',
 };
 
 // Additional text styles

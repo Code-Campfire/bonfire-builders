@@ -58,7 +58,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
       }
 
       // Always create in-app notification
-      await prisma.notification.create({
+      const notification = await prisma.notification.create({
         data: {
           user_id: issue.user_id,
           type: 'MESSAGE_RECEIVED',
@@ -68,6 +68,10 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
           message_id: message.id
         }
       });
+
+      // Emit real-time notification event to the tenant
+      const io = req.app.get('io');
+      io.to(`user-${issue.user_id}`).emit('new-notification', notification);
     }
 
     // Send notifications to landlords if tenant sent message
@@ -79,9 +83,11 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
         }
       });
 
+      const io = req.app.get('io');
+
       // Create in-app notifications for all landlords
       for (const landlord of landlords) {
-        await prisma.notification.create({
+        const notification = await prisma.notification.create({
           data: {
             user_id: landlord.id,
             type: 'MESSAGE_RECEIVED',
@@ -91,10 +97,13 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
             message_id: message.id
           }
         });
+
+        // Emit real-time notification event to each landlord
+        io.to(`user-${landlord.id}`).emit('new-notification', notification);
       }
     }
 
-    // Emit real-time event
+    // Emit real-time message event to issue room
     const io = req.app.get('io');
     io.to(`issue-${issue_id}`).emit('new-message', message);
 

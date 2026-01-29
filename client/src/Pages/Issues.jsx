@@ -1,29 +1,33 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import IssueCard from "../components/IssueCard";
 import IssueForm from "../Components/issueForm";
 import { issueAPI } from "../services/api";
 import { IssueFilters } from "../Components/IssueFilters";
 import { getButtonClasses } from "../styles/helpers";
-import { colors, alerts } from "../styles/colors";
+import { colors, alerts, loadingStyles } from "../styles/colors";
 import { typography } from "../styles/typography";
-import { spacing, flexRow, flexCol } from "../styles/layout";
+import { spacing, flexRow, flexCol, flexWrap } from "../styles/layout";
+import { toast } from "sonner";
 
 const Issues = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showForm, setShowForm] = useState(false);
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({
-    status: "all",
-    priority: "all",
-    category: "all",
-    startDate: "",
-    endDate: "",
-  });
+
+  // Derive filters from URL search params (URL is the source of truth)
+  const filters = {
+    status: searchParams.get("status") || "all",
+    priority: searchParams.get("priority") || "all",
+    category: searchParams.get("category") || "all",
+    startDate: searchParams.get("startDate") || "",
+    endDate: searchParams.get("endDate") || "",
+  };
 
   // Check if URL indicates we should show the form
   useEffect(() => {
@@ -78,10 +82,13 @@ const Issues = () => {
   };
   // filterKey, value
   const handleFiltersChange = (filterKey, value) => {
-    setFilters({
-      ...filters,
-      [filterKey]: value,
-    });
+    const newParams = new URLSearchParams(searchParams);
+    if (value === "all" || value === "") {
+      newParams.delete(filterKey);
+    } else {
+      newParams.set(filterKey, value);
+    }
+    setSearchParams(newParams, { replace: true });
   };
 
   // Filter issues based on current filters
@@ -174,7 +181,7 @@ const Issues = () => {
       ) : loading ? (
         <div className={flexCol.centerCenter + " py-12"}>
           <svg
-            className="animate-spin h-12 w-12 text-primary mb-4"
+            className={loadingStyles.spinner}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -227,7 +234,7 @@ const Issues = () => {
             filters={filters}
             onFilterChange={handleFiltersChange}
           />
-          <div className="flex flex-row flex-wrap gap-4">
+          <div className={flexWrap.row}>
             {filteredIssues.map((issue) => (
               <IssueCard key={issue.id} issue={issue} />
             ))}

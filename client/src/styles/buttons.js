@@ -3,7 +3,7 @@
  * Centralized button classes for consistent styling across the app
  */
 
-export const buttonBase = 'px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+export const buttonBase = 'inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
 export const buttonVariants = {
   primary: `${buttonBase} bg-primary text-primary-foreground hover:bg-primary/90`,
@@ -13,6 +13,7 @@ export const buttonVariants = {
   ghost: `${buttonBase} hover:bg-accent hover:text-accent-foreground`,
   link: 'text-primary underline-offset-4 hover:underline',
   settings: `${buttonBase} bg-blue-500 text-white hover:bg-green-100 hover:text-green-700`,
+  metrics: `${buttonBase} bg-purple-600 text-white hover:bg-purple-700`,
 };
 
 export const buttonSizes = {
