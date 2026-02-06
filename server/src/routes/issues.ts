@@ -309,14 +309,24 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     // Set date fields based on status transitions
     // When moving to a status, set its date if not already set
     // When moving back to an earlier status, clear the dates for later statuses
-    if (status === 'PENDING') {
-      // Moving back to PENDING clears all progress dates
+    if (status === 'OPEN') {
+      // Moving back to OPEN clears all progress dates
       updateData.acknowledged_date = null;
+      updateData.in_progress_date = null;
       updateData.resolved_date = null;
       updateData.closed_date = null;
     } else if (status === 'IN_PROGRESS') {
+      // Automatically set acknowledged_date if not set (first time acknowledging)
       if (!currentIssue.acknowledged_date) {
         updateData.acknowledged_date = new Date();
+      }
+      // Automatically set in_progress_date when work starts
+      const currentIssueWithInProgress = await prisma.issue.findUnique({
+        where: { id: issueId },
+        select: { in_progress_date: true }
+      });
+      if (!currentIssueWithInProgress?.in_progress_date) {
+        updateData.in_progress_date = new Date();
       }
       // Clear resolved and closed dates (moving back from later status)
       updateData.resolved_date = null;
@@ -327,10 +337,8 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
       }
       // Clear closed_date (moving back from CLOSED)
       updateData.closed_date = null;
-      // Reset tenant confirmation so they can confirm/dispute again
-      updateData.tenant_confirmed = null;
-      updateData.tenant_confirmation_date = null;
-      updateData.tenant_confirmation_notes = null;
+      // NOTE: We do NOT clear tenant_confirmed here - it preserves first response for metrics
+      // Tenant can still respond again via the confirmation endpoint
     } else if (status === 'CLOSED') {
       if (!currentIssue.closed_date) {
         updateData.closed_date = new Date();

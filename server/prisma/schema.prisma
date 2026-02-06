@@ -54,6 +54,7 @@ model Issue {
   status      Status   @default(OPEN)
   location    String
   acknowledged_date DateTime?
+  in_progress_date DateTime?
   resolved_date DateTime?
   closed_date DateTime?
   tenant_confirmed Boolean?

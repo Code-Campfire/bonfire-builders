@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import IssueCard from "../components/IssueCard";
 import IssueForm from "../Components/issueForm";
 import { issueAPI } from "../services/api";
@@ -13,18 +13,21 @@ import { toast } from "sonner";
 const Issues = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showForm, setShowForm] = useState(false);
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({
-    status: "all",
-    priority: "all",
-    category: "all",
-    startDate: "",
-    endDate: "",
-  });
+
+  // Derive filters from URL search params (URL is the source of truth)
+  const filters = {
+    status: searchParams.get("status") || "all",
+    priority: searchParams.get("priority") || "all",
+    category: searchParams.get("category") || "all",
+    startDate: searchParams.get("startDate") || "",
+    endDate: searchParams.get("endDate") || "",
+  };
 
   // Check if URL indicates we should show the form
   useEffect(() => {
@@ -79,10 +82,13 @@ const Issues = () => {
   };
   // filterKey, value
   const handleFiltersChange = (filterKey, value) => {
-    setFilters({
-      ...filters,
-      [filterKey]: value,
-    });
+    const newParams = new URLSearchParams(searchParams);
+    if (value === "all" || value === "") {
+      newParams.delete(filterKey);
+    } else {
+      newParams.set(filterKey, value);
+    }
+    setSearchParams(newParams, { replace: true });
   };
 
   // Filter issues based on current filters

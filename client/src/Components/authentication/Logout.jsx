@@ -1,12 +1,12 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/context";
-import { Plus, LogOut, List, Settings } from "lucide-react";
+import { Plus, LogOut, List, Settings, BarChart3 } from "lucide-react";
 import { NotificationBell } from "../NotificationBell";
 import { getButtonClasses } from "../../styles/helpers";
 import { navbar } from "../../styles/colors";
 
 export const Layout = () => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const handleReportIssue = () => {
@@ -38,6 +38,13 @@ export const Layout = () => {
             >
               <Plus className="h-4 w-4" />
               Report New Issue
+            </button>
+            <button
+              onClick={() => navigate("/metrics")}
+              className={getButtonClasses('metrics', 'md', 'flex items-center gap-2')}
+            >
+              <BarChart3 className="h-4 w-4" />
+              Metrics
             </button>
             <button
               onClick={logout}

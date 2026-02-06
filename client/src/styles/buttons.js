@@ -13,6 +13,7 @@ export const buttonVariants = {
   ghost: `${buttonBase} hover:bg-accent hover:text-accent-foreground`,
   link: 'text-primary underline-offset-4 hover:underline',
   settings: `${buttonBase} bg-blue-500 text-white hover:bg-green-100 hover:text-green-700`,
+  metrics: `${buttonBase} bg-purple-600 text-white hover:bg-purple-700`,
 };
 
 export const buttonSizes = {

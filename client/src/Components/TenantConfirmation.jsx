@@ -25,42 +25,64 @@ export const TenantConfirmation = ({ issue, onConfirmation }) => {
     return null;
   }
 
-  // If already confirmed/disputed (tenant_confirmed is a boolean), show the result
-  if (typeof issue.tenant_confirmed === 'boolean') {
+  // If already confirmed (tenant_confirmed === true), show the result
+  // If disputed (tenant_confirmed === false), allow them to respond again
+  if (issue.tenant_confirmed === true) {
     return (
       <Card className="mb-6">
         <CardHeader>
           <h2 className={typography.h2 + ' ' + flexRow.startCenter + ' ' + spacing.gap2}>
-            {issue.tenant_confirmed ? (
-              <>
-                <CheckCircle className={`h-5 w-5 ${confirmationColors.confirmed}`} />
-                Repair Confirmed
-              </>
-            ) : (
-              <>
-                <XCircle className={`h-5 w-5 ${confirmationColors.disputed}`} />
-                Repair Disputed
-              </>
-            )}
+            <CheckCircle className={`h-5 w-5 ${confirmationColors.confirmed}`} />
+            Repair Confirmed
           </h2>
         </CardHeader>
         <CardContent>
           <div className={colors.textMutedForeground + ' text-sm'}>
-            {issue.tenant_confirmed ? (
-              <p>You confirmed this repair on {new Date(issue.tenant_confirmation_date).toLocaleDateString()}</p>
-            ) : (
-              <>
-                <p>You disputed this repair on {new Date(issue.tenant_confirmation_date).toLocaleDateString()}</p>
-                {issue.tenant_confirmation_notes && (
-                  <p className="mt-2 italic">"{issue.tenant_confirmation_notes}"</p>
-                )}
-              </>
-            )}
+            <p>You confirmed this repair on {new Date(issue.tenant_confirmation_date).toLocaleDateString()}</p>
           </div>
         </CardContent>
       </Card>
     );
   }
+
+  // COMMENTED OUT: Previously showed "Repair Disputed" message which prevented re-confirmation
+  // Now tenants can respond again after disputing, allowing the issue to be closed eventually
+  // The first dispute is still preserved in tenant_confirmed for metrics calculation
+  // if (typeof issue.tenant_confirmed === 'boolean') {
+  //   return (
+  //     <Card className="mb-6">
+  //       <CardHeader>
+  //         <h2 className={typography.h2 + ' ' + flexRow.startCenter + ' ' + spacing.gap2}>
+  //           {issue.tenant_confirmed ? (
+  //             <>
+  //               <CheckCircle className={`h-5 w-5 ${confirmationColors.confirmed}`} />
+  //               Repair Confirmed
+  //             </>
+  //           ) : (
+  //             <>
+  //               <XCircle className={`h-5 w-5 ${confirmationColors.disputed}`} />
+  //               Repair Disputed
+  //             </>
+  //           )}
+  //         </h2>
+  //       </CardHeader>
+  //       <CardContent>
+  //         <div className={colors.textMutedForeground + ' text-sm'}>
+  //           {issue.tenant_confirmed ? (
+  //             <p>You confirmed this repair on {new Date(issue.tenant_confirmation_date).toLocaleDateString()}</p>
+  //           ) : (
+  //             <>
+  //               <p>You disputed this repair on {new Date(issue.tenant_confirmation_date).toLocaleDateString()}</p>
+  //               {issue.tenant_confirmation_notes && (
+  //                 <p className="mt-2 italic">"{issue.tenant_confirmation_notes}"</p>
+  //               )}
+  //             </>
+  //           )}
+  //         </div>
+  //       </CardContent>
+  //     </Card>
+  //   );
+  // }
 
   const handleConfirm = async () => {
     setIsSubmitting(true);
