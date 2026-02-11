@@ -9,6 +9,7 @@ import messagesRouter from './routes/messages';
 import complexesRouter from './routes/complexes';
 import authRouter from './routes/auth';
 import notificationsRouter from './routes/notifications';
+import metricsRouter from './routes/metrics';
 const app = express();
 
 // Middleware
@@ -32,6 +33,7 @@ app.use('/api/messages', messagesRouter);
 app.use('/api/complexes', complexesRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/notifications', notificationsRouter);
+app.use('/api/metrics', metricsRouter);
 
 // Basic route
 app.get('/', (req: Request, res: Response) => {

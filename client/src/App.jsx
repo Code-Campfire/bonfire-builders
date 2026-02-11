@@ -4,6 +4,7 @@ import Issues from './Pages/Issues';
 import IssueDetail from './Pages/IssueDetail';
 import EditIssue from './Pages/EditIssue';
 import Settings from './Pages/Settings';
+import Metrics from './Pages/Metrics';
 import { useAuth } from './context/context';
 import { LoginForm } from './Components/authentication/LoginForm'
 import { RegistrationForm } from './Components/authentication/RegistrationForm'
@@ -49,6 +50,7 @@ function App() {
         <Route path="/issues/:id/edit" element={<EditIssue />} />
         <Route path="/issues/:id" element={<IssueDetail />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/metrics" element={<Metrics />} />
       </Route>
     </Routes>
     </>
